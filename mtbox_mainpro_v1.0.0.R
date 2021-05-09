@@ -7,7 +7,7 @@
 ## ==================================================================== ##
 
 ## ==================================================================== ##
-setwd("E:/UoB PhD/Second year_phD/20200620_9box_model/code/16box_v1.0.0_RCS")
+setwd("...")
 
 ## ************************* library packages ************************* ##
 library(tidyverse)
@@ -28,9 +28,9 @@ rm(list = ls(all = T))
 ##	 l1,l2 the width  of the boxes
 nbv = 16; nbh = 4; nbox = 16;
 
-Htotal = 36; Ltotal = 18;
+Htotal = 18; Ltotal = 18;
 
-alphaH = array(c(0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625,0.0625),c(nbv,1));
+alphaH = array(c(0.25,0.25,0.25,0.25),c(nbv,1));
 betaL = array(c(0.25,0.25,0.25,0.25),c(nbh,1)) # The summation is equal to 1.0!
 
 #
@@ -302,50 +302,54 @@ Carr[,,52] = iPS
 ## =======================================================================
   source("16Exchange_module_v1.0.0.R")
   source("16Chemi_module_RCS_v1.0.0.R")
+
 ## =======================================================================
 ## ************************** The time loop *************************** ##
 ## created by YQ- on 26/10/2020                                         ##
 ## =======================================================================
 for (nint in 1:nosteps)
 {  
-  ## Setup initial/background concentrations with 30 min spin-up
+  # Setup initial/background concentrations with 30 min spin-up
   if (nint <= 1800.00/deltaTime) 
     {
-    ## Chemistry
-      ## NO.1 beta =1.0 for spin-up
+    # Chemistry
+      # NO.1 beta =1.0 for spin-up
       Carr = chemi(Carr, deltaTime, beta = 1.0, dtchem)
       for (NoS in 1:Numspe)
       {
         cBgarr[NoS] = Carr[1,1,NoS]
       }
-      ## Calculate chemical timescale
-      ## Tchem = chemti(Carr,beta)
-      ## nint = nint +1
+      # Calculate chemical timescale
+      # Tchem = chemti(Carr,beta)
+      # nint = nint +1
       
     } else
-    { ## Adding emissions & exchange
+    { # Adding emissions & exchange
       # Note: for one hr run, the nint step is 3600/0.03 (deltaTime) = 120000!
       myquot = nint %/% 120000;
       myrem = nint %% 120000;
-      ## update time varying ue;we;ua;wa 
+      
+      # update time varying ue;we;ua;wa 
       wt = wtin[myquot+1]+(myrem/120000)*(wtin[myquot+2]-wtin[myquot+1]);
       ue = uein*(wt/0.021)
       we = wein*(wt/0.021)
       ua = uain*(wt/0.021)
       wa = wain*(wt/0.021)
-      ## update time varying emissions
+      
+      # update time varying emissions
       traffic=trafficin[myquot+1,]+(myrem/120000)*(trafficin[myquot+2,]-trafficin[myquot+1,]);
       traScale=traffic/1500.0; # Emission profile refers to 1500 vehicles per hour
-      ## update time varying cloud cover
+      
+      # update time varying cloud cover
       cloud=cloudin[myquot+1]+(myrem/120000)*(cloudin[myquot+2]-cloudin[myquot+1]);
       beta=(8.0-cloud)/8.0; # update photolysis rate
  
-      ## ************** update the concentration of Carr **************** ##
-      ## Chemistry
+      # update the concentration of Carr
+      # Chemistry
       Carr = chemi(Carr, deltaTime, beta, dtchem)
       
-      ## **************** add emissions into the model ****************** ##
-      ## 
+      # add emissions into the model
+       
       for (NoS in 1:Numspe)
       {
         Carr[1,1,NoS] = Carr[1,1,NoS]+Emiarr[NoS,1]*deltaTime*traScale[1]; # 1st road!
@@ -354,17 +358,17 @@ for (nint in 1:nosteps)
         Carr[1,4,NoS] = Carr[1,4,NoS]+Emiarr[NoS,4]*deltaTime*traScale[4]; # 4th road!
       } 
       
-      ## ******** add exchanges with background into the model ********** ##
+      # add exchanges with background into the model
       Carr = exclock(u = ue, w = we, U = ua, W = wa, Carr, cBgarr,
                h,l, nbox, nbv, nbh,
                deltaTime, NoS, Numspe)
       }
 
-      ## *******************  COMPLETE one round!  ********************** ##
+      # ***********  COMPLETE one round!  ************ #
   if (nint %% nprint == 0)
   {
       write(Carr, file = "16box_RCSs_BASE_yzywt.csv", ncolumns = if(is.character(Carr)) 1 else 832, 
             append = T, sep = ",")
   }
 }
-## *************************** !!!COMPLETE!!! *************************** ##
+## *************************** COMPLETE! *************************** ##
