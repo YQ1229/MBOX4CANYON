@@ -7,11 +7,11 @@ exclock <- function(u, w, U, W, Carr, cBgarr,h,l,
                     nbox, nbv, nbh,
                     deltaTime, NoS, Numspe)
 {
-  # this programme uses Rugge-Kutta solve the matrix ODEs
+  # this programme uses the 4th order Rugge-Kutta to solve the matrix ODEs
   
   # Carr: solution in matrix
   # output: Carr[kbox,ibox,Species]
-  # e.g. Carr[1,1,1] refers to concentrations of 1st species(NO) in Box[1,1]
+  # e.g., Carr[1,1,1] refers to concentrations of 1st species(NO) in Box[1,1]
   
   # fw: vertical fluxes
   # fu: horizontal fluxes
@@ -127,80 +127,10 @@ exclock <- function(u, w, U, W, Carr, cBgarr,h,l,
 
   # Note
   # Ft[k,i] = (u[k,i](Carr[k,i-1,NoS]-Carr[k,i,NoS]))
-  # Ft[1,2] = (u[1,2]*(Carr[1,1,NoS]-Carr[1,2,NoS]))
-  # Ft[1,3] = (u[1,3]*(Carr[1,2,NoS]-Carr[1,3,NoS]))
-  # Ft[1,4] = (u[1,4]*(Carr[1,3,NoS]-Carr[1,4,NoS]))
-  # Ft[2,2] = (u[2,2]*(Carr[2,1,NoS]-Carr[2,2,NoS]))
-  # Ft[2,3] = (u[2,3]*(Carr[2,2,NoS]-Carr[2,3,NoS]))
-  # Ft[2,4] = (u[2,4]*(Carr[2,3,NoS]-Carr[2,4,NoS]))
-  # Ft[3,2] = (u[3,2]*(Carr[3,1,NoS]-Carr[3,2,NoS]))
-  # Ft[3,3] = (u[3,3]*(Carr[3,2,NoS]-Carr[3,3,NoS]))
-  # Ft[3,4] = (u[3,4]*(Carr[3,3,NoS]-Carr[3,4,NoS]))
-  # Ft[4,2] = (u[4,2]*(Carr[4,1,NoS]-Carr[4,2,NoS]))
-  # Ft[4,3] = (u[4,3]*(Carr[4,2,NoS]-Carr[4,3,NoS]))
-  # Ft[4,4] = (u[4,4]*(Carr[4,3,NoS]-Carr[4,4,NoS]))
   # Fa[k,i] = (0.5*(sign(U[k,i])+1)*U[k,i]*Carr[k,i-1,NoS]+0.5*(1-sign(U[k,i]))*U[k,i]*Carr[k,i,NoS])
-  # Fa[1,2] = (0.5*(sign(U[1,2])+1)*U[1,2]*Carr[1,1,NoS]+0.5*(1-sign(U[1,2]))*U[1,2]*Carr[1,2,NoS])
-  # Fa[1,3] = (0.5*(sign(U[1,3])+1)*U[1,3]*Carr[1,2,NoS]+0.5*(1-sign(U[1,3]))*U[1,3]*Carr[1,3,NoS])
-  # Fa[1,4] = (0.5*(sign(U[1,4])+1)*U[1,4]*Carr[1,3,NoS]+0.5*(1-sign(U[1,4]))*U[1,4]*Carr[1,4,NoS])
-  # Fa[2,2] = (0.5*(sign(U[2,2])+1)*U[2,2]*Carr[2,1,NoS]+0.5*(1-sign(U[2,2]))*U[2,2]*Carr[2,2,NoS])
-  # Fa[2,3] = (0.5*(sign(U[2,3])+1)*U[2,3]*Carr[2,2,NoS]+0.5*(1-sign(U[2,3]))*U[2,3]*Carr[2,3,NoS])
-  # Fa[2,4] = (0.5*(sign(U[2,4])+1)*U[2,4]*Carr[2,3,NoS]+0.5*(1-sign(U[2,4]))*U[2,4]*Carr[2,4,NoS])
-  # Fa[3,2] = (0.5*(sign(U[3,2])+1)*U[3,2]*Carr[3,1,NoS]+0.5*(1-sign(U[3,2]))*U[3,2]*Carr[3,2,NoS])
-  # Fa[3,3] = (0.5*(sign(U[3,3])+1)*U[3,3]*Carr[3,2,NoS]+0.5*(1-sign(U[3,3]))*U[3,3]*Carr[3,3,NoS])
-  # Fa[3,4] = (0.5*(sign(U[3,4])+1)*U[3,4]*Carr[3,3,NoS]+0.5*(1-sign(U[3,4]))*U[3,4]*Carr[3,4,NoS])
-  # Fa[4,2] = (0.5*(sign(U[4,2])+1)*U[4,2]*Carr[4,1,NoS]+0.5*(1-sign(U[4,2]))*U[4,2]*Carr[4,2,NoS])
-  # Fa[4,3] = (0.5*(sign(U[4,3])+1)*U[4,3]*Carr[4,2,NoS]+0.5*(1-sign(U[4,3]))*U[4,3]*Carr[4,3,NoS])
-  # Fa[4,4] = (0.5*(sign(U[4,4])+1)*U[4,4]*Carr[4,3,NoS]+0.5*(1-sign(U[4,4]))*U[4,4]*Carr[4,4,NoS])
   # Gt[k,i] = (w[k,i](Carr[k-1,i,NoS]-Carr[k,i,NoS]))
-  # Gt[2,1] = (w[2,1]*(Carr[1,1,NoS]-Carr[2,1,NoS]))
-  # Gt[2,2] = (w[2,2]*(Carr[1,2,NoS]-Carr[2,2,NoS]))
-  # Gt[2,3] = (w[2,3]*(Carr[1,3,NoS]-Carr[2,3,NoS]))
-  # Gt[2,4] = (w[2,4]*(Carr[1,4,NoS]-Carr[2,4,NoS]))
-  # Gt[3,1] = (w[3,1]*(Carr[2,1,NoS]-Carr[3,1,NoS]))
-  # Gt[3,2] = (w[3,2]*(Carr[2,2,NoS]-Carr[3,2,NoS]))
-  # Gt[3,3] = (w[3,3]*(Carr[2,3,NoS]-Carr[3,3,NoS]))
-  # Gt[3,4] = (w[3,4]*(Carr[2,4,NoS]-Carr[3,4,NoS]))
-  # Gt[4,1] = (w[4,1]*(Carr[3,1,NoS]-Carr[4,1,NoS]))
-  # Gt[4,2] = (w[4,2]*(Carr[3,2,NoS]-Carr[4,2,NoS]))
-  # Gt[4,3] = (w[4,3]*(Carr[3,3,NoS]-Carr[4,3,NoS]))
-  # Gt[4,4] = (w[4,4]*(Carr[3,4,NoS]-Carr[4,4,NoS]))
-  # Gt[5,1] = (w[5,1]*(Carr[4,1,NoS]-cBgarr[NoS]))
-  # Gt[5,2] = (w[5,2]*(Carr[4,2,NoS]-cBgarr[NoS]))
-  # Gt[5,3] = (w[5,3]*(Carr[4,3,NoS]-cBgarr[NoS]))
-  # Gt[5,4] = (w[5,4]*(Carr[4,4,NoS]-cBgarr[NoS]))
   # Ga[k,i] = (0.5*(sign(W[k,i])+1)*W[k,i]*Carr[k-1,i,NoS]+0.5*(1-sign(W[k,i]))*W[k,i]*Carr[k,i,NoS])
-  # Ga[2,1] = (0.5*(sign(W[2,1])+1)*W[2,1]*Carr[1,1,NoS]+0.5*(1-sign(W[2,1]))*W[2,1]*Carr[2,1,NoS])
-  # Ga[2,2] = (0.5*(sign(W[2,2])+1)*W[2,2]*Carr[1,2,NoS]+0.5*(1-sign(W[2,2]))*W[2,2]*Carr[2,2,NoS])
-  # Ga[2,3] = (0.5*(sign(W[2,3])+1)*W[2,3]*Carr[1,3,NoS]+0.5*(1-sign(W[2,3]))*W[2,3]*Carr[2,3,NoS])
-  # Ga[2,4] = (0.5*(sign(W[2,4])+1)*W[2,4]*Carr[1,4,NoS]+0.5*(1-sign(W[2,4]))*W[2,4]*Carr[2,4,NoS])
-  # Ga[3,1] = (0.5*(sign(W[3,1])+1)*W[3,1]*Carr[2,1,NoS]+0.5*(1-sign(W[3,1]))*W[3,1]*Carr[3,1,NoS])
-  # Ga[3,2] = (0.5*(sign(W[3,2])+1)*W[3,2]*Carr[2,2,NoS]+0.5*(1-sign(W[3,2]))*W[3,2]*Carr[3,2,NoS])
-  # Ga[3,3] = (0.5*(sign(W[3,3])+1)*W[3,3]*Carr[2,3,NoS]+0.5*(1-sign(W[3,3]))*W[3,3]*Carr[3,3,NoS])
-  # Ga[3,4] = (0.5*(sign(W[3,4])+1)*W[3,4]*Carr[2,4,NoS]+0.5*(1-sign(W[3,4]))*W[3,4]*Carr[3,4,NoS])
-  # Ga[4,1] = (0.5*(sign(W[4,1])+1)*W[4,1]*Carr[3,1,NoS]+0.5*(1-sign(W[4,1]))*W[4,1]*Carr[4,1,NoS])
-  # Ga[4,2] = (0.5*(sign(W[4,2])+1)*W[4,2]*Carr[3,2,NoS]+0.5*(1-sign(W[4,2]))*W[4,2]*Carr[4,2,NoS])
-  # Ga[4,3] = (0.5*(sign(W[4,3])+1)*W[4,3]*Carr[3,3,NoS]+0.5*(1-sign(W[4,3]))*W[4,3]*Carr[4,3,NoS])
-  # Ga[4,4] = (0.5*(sign(W[4,4])+1)*W[4,4]*Carr[3,4,NoS]+0.5*(1-sign(W[4,4]))*W[4,4]*Carr[4,4,NoS])
-  
-  
-  # k111 = -Ga[2,1]/h[1]-Gt[2,1]/h[1]-Fa[1,2]/l[1]-Ft[1,2]/l[1]
-  # k112 = -Ga[2,2]/h[1]-Gt[2,2]/h[1]+Fa[1,2]/l[2]+Ft[1,2]/l[2]-Fa[1,3]/l[2]-Ft[1,3]/l[2]
-  # k113 = -Ga[2,3]/h[1]-Gt[2,3]/h[1]+Fa[1,3]/l[3]+Ft[1,3]/l[3]-Fa[1,4]/l[3]-Ft[1,4]/l[3]
-  # k114 = -Ga[2,4]/h[1]-Gt[2,4]/h[1]+Fa[1,4]/l[4]+Ft[1,4]/l[4]
-  # k121 = Ga[2,1]/h[2]+Gt[2,1]/h[2]-Ga[3,1]/h[2]-Gt[3,1]/h[2]-Fa[2,2]/l[1]-Ft[2,2]/l[1]
-  # k122 = Ga[2,2]/h[2]+Gt[2,2]/h[2]-Ga[3,2]/h[2]-Gt[3,2]/h[2]+Fa[2,2]/l[2]+Ft[2,2]/l[2]-Fa[2,3]/l[2]-Ft[2,3]/l[2]
-  # k123 = Ga[2,3]/h[2]+Gt[2,3]/h[2]-Ga[3,3]/h[2]-Gt[3,3]/h[2]+Fa[2,3]/l[3]+Ft[2,3]/l[3]-Fa[2,4]/l[3]-Ft[2,4]/l[3]
-  # k124 = Ga[2,4]/h[2]+Gt[2,4]/h[2]-Ga[3,4]/h[2]-Gt[3,4]/h[2]+Fa[2,4]/l[4]+Ft[2,4]/l[4]   
-  # k131 = Ga[3,1]/h[3]+Gt[3,1]/h[3]-Ga[4,1]/h[3]-Gt[4,1]/h[3]-Fa[3,2]/l[1]-Ft[3,2]/l[1]
-  # k132 = Ga[3,2]/h[3]+Gt[3,2]/h[3]-Ga[4,2]/h[3]-Gt[4,2]/h[3]+Fa[3,2]/l[2]+Ft[3,2]/l[2]-Fa[3,3]/l[2]-Ft[3,3]/l[2]
-  # k133 = Ga[3,3]/h[3]+Gt[3,3]/h[3]-Ga[4,3]/h[3]-Gt[4,3]/h[3]+Fa[3,3]/l[3]+Ft[3,3]/l[3]-Fa[3,4]/l[3]-Ft[3,4]/l[3]
-  # k134 = Ga[3,4]/h[3]+Gt[3,4]/h[3]-Ga[4,4]/h[3]-Gt[4,4]/h[3]+Fa[3,4]/l[4]+Ft[3,4]/l[4]   
-  # k141 = Ga[4,1]/h[4]+Gt[4,1]/h[4]-Gt[5,1]/h[4]-Fa[4,2]/l[1]-Ft[4,2]/l[1]
-  # k142 = Ga[4,2]/h[4]+Gt[4,2]/h[4]-Gt[5,2]/h[4]+Fa[4,2]/l[2]+Ft[4,2]/l[2]-Fa[4,3]/l[2]-Ft[4,3]/l[2]
-  # k143 = Ga[4,3]/h[4]+Gt[4,3]/h[4]-Gt[5,3]/h[4]+Fa[4,3]/l[3]+Ft[4,3]/l[3]-Fa[4,4]/l[3]-Ft[4,4]/l[3]
-  # k144 = Ga[4,4]/h[4]+Gt[4,4]/h[4]-Gt[5,4]/h[4]+Fa[4,4]/l[4]+Ft[4,4]/l[4]  
-  
+
   # browser()
   # return(list(Carr, fw=f, fu=g, we=w, wa=W, ue=u, ua=U, Amatrix=a, d=d, residual=C))
 ## **************************  COMPLETE!  ***************************** ##
