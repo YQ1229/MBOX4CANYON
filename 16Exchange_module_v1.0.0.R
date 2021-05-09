@@ -1,0 +1,206 @@
+## =======================================================================
+##  *********** load exchange module for multi-box model  ************  ##
+## updated by YQ- on 26/10/2020                                         ##
+##                                                                      ##
+## =======================================================================
+exclock <- function(u, w, U, W, Carr, cBgarr,h,l,
+                    nbox, nbv, nbh,
+                    deltaTime, NoS, Numspe)
+{
+  # this programme uses Rugge-Kutta solve the matrix ODEs
+  
+  # Carr: solution in matrix
+  # output: Carr[kbox,ibox,Species]
+  # e.g. Carr[1,1,1] refers to concentrations of 1st species(NO) in Box[1,1]
+  
+  # fw: vertical fluxes
+  # fu: horizontal fluxes
+  # residual: should be 0 for a correct solution
+  # solve ODEs via runge-kutta forth-order equations
+  
+  for (NoS in 1:Numspe)
+  {
+  k111 = -(0.5*(sign(W[2,1])+1)*W[2,1]*Carr[1,1,NoS]+0.5*(1-sign(W[2,1]))*W[2,1]*Carr[2,1,NoS])/h[1]-(w[2,1]*(Carr[1,1,NoS]-Carr[2,1,NoS]))/h[1]-(0.5*(sign(U[1,2])+1)*U[1,2]*Carr[1,1,NoS]+0.5*(1-sign(U[1,2]))*U[1,2]*Carr[1,2,NoS])/l[1]-(u[1,2]*(Carr[1,1,NoS]-Carr[1,2,NoS]))/l[1]
+  k112 = -(0.5*(sign(W[2,2])+1)*W[2,2]*Carr[1,2,NoS]+0.5*(1-sign(W[2,2]))*W[2,2]*Carr[2,2,NoS])/h[1]-(w[2,2]*(Carr[1,2,NoS]-Carr[2,2,NoS]))/h[1]+(0.5*(sign(U[1,2])+1)*U[1,2]*Carr[1,1,NoS]+0.5*(1-sign(U[1,2]))*U[1,2]*Carr[1,2,NoS])/l[2]+(u[1,2]*(Carr[1,1,NoS]-Carr[1,2,NoS]))/l[2]-(0.5*(sign(U[1,3])+1)*U[1,3]*Carr[1,2,NoS]+0.5*(1-sign(U[1,3]))*U[1,3]*Carr[1,3,NoS])/l[2]-(u[1,3]*(Carr[1,2,NoS]-Carr[1,3,NoS]))/l[2]
+  k113 = -(0.5*(sign(W[2,3])+1)*W[2,3]*Carr[1,3,NoS]+0.5*(1-sign(W[2,3]))*W[2,3]*Carr[2,3,NoS])/h[1]-(w[2,3]*(Carr[1,3,NoS]-Carr[2,3,NoS]))/h[1]+(0.5*(sign(U[1,3])+1)*U[1,3]*Carr[1,2,NoS]+0.5*(1-sign(U[1,3]))*U[1,3]*Carr[1,3,NoS])/l[3]+(u[1,3]*(Carr[1,2,NoS]-Carr[1,3,NoS]))/l[3]-(0.5*(sign(U[1,4])+1)*U[1,4]*Carr[1,3,NoS]+0.5*(1-sign(U[1,4]))*U[1,4]*Carr[1,4,NoS])/l[3]-(u[1,4]*(Carr[1,3,NoS]-Carr[1,4,NoS]))/l[3]
+  k114 = -(0.5*(sign(W[2,4])+1)*W[2,4]*Carr[1,4,NoS]+0.5*(1-sign(W[2,4]))*W[2,4]*Carr[2,4,NoS])/h[1]-(w[2,4]*(Carr[1,4,NoS]-Carr[2,4,NoS]))/h[1]+(0.5*(sign(U[1,4])+1)*U[1,4]*Carr[1,3,NoS]+0.5*(1-sign(U[1,4]))*U[1,4]*Carr[1,4,NoS])/l[4]+(u[1,4]*(Carr[1,3,NoS]-Carr[1,4,NoS]))/l[4]
+  
+  k121 = (0.5*(sign(W[2,1])+1)*W[2,1]*Carr[1,1,NoS]+0.5*(1-sign(W[2,1]))*W[2,1]*Carr[2,1,NoS])/h[2]+(w[2,1]*(Carr[1,1,NoS]-Carr[2,1,NoS]))/h[2]-(0.5*(sign(W[3,1])+1)*W[3,1]*Carr[2,1,NoS]+0.5*(1-sign(W[3,1]))*W[3,1]*Carr[3,1,NoS])/h[2]-(w[3,1]*(Carr[2,1,NoS]-Carr[3,1,NoS]))/h[2]-(0.5*(sign(U[2,2])+1)*U[2,2]*Carr[2,1,NoS]+0.5*(1-sign(U[2,2]))*U[2,2]*Carr[2,2,NoS])/l[1]-(u[2,2]*(Carr[2,1,NoS]-Carr[2,2,NoS]))/l[1]
+  k122 = (0.5*(sign(W[2,2])+1)*W[2,2]*Carr[1,2,NoS]+0.5*(1-sign(W[2,2]))*W[2,2]*Carr[2,2,NoS])/h[2]+(w[2,2]*(Carr[1,2,NoS]-Carr[2,2,NoS]))/h[2]-(0.5*(sign(W[3,2])+1)*W[3,2]*Carr[2,2,NoS]+0.5*(1-sign(W[3,2]))*W[3,2]*Carr[3,2,NoS])/h[2]-(w[3,2]*(Carr[2,2,NoS]-Carr[3,2,NoS]))/h[2]+(0.5*(sign(U[2,2])+1)*U[2,2]*Carr[2,1,NoS]+0.5*(1-sign(U[2,2]))*U[2,2]*Carr[2,2,NoS])/l[2]+(u[2,2]*(Carr[2,1,NoS]-Carr[2,2,NoS]))/l[2]-(0.5*(sign(U[2,3])+1)*U[2,3]*Carr[2,2,NoS]+0.5*(1-sign(U[2,3]))*U[2,3]*Carr[2,3,NoS])/l[2]-(u[2,3]*(Carr[2,2,NoS]-Carr[2,3,NoS]))/l[2]
+  k123 = (0.5*(sign(W[2,3])+1)*W[2,3]*Carr[1,3,NoS]+0.5*(1-sign(W[2,3]))*W[2,3]*Carr[2,3,NoS])/h[2]+(w[2,3]*(Carr[1,3,NoS]-Carr[2,3,NoS]))/h[2]-(0.5*(sign(W[3,3])+1)*W[3,3]*Carr[2,3,NoS]+0.5*(1-sign(W[3,3]))*W[3,3]*Carr[3,3,NoS])/h[2]-(w[3,3]*(Carr[2,3,NoS]-Carr[3,3,NoS]))/h[2]+(0.5*(sign(U[2,3])+1)*U[2,3]*Carr[2,2,NoS]+0.5*(1-sign(U[2,3]))*U[2,3]*Carr[2,3,NoS])/l[3]+(u[2,3]*(Carr[2,2,NoS]-Carr[2,3,NoS]))/l[3]-(0.5*(sign(U[2,4])+1)*U[2,4]*Carr[2,3,NoS]+0.5*(1-sign(U[2,4]))*U[2,4]*Carr[2,4,NoS])/l[3]-(u[2,4]*(Carr[2,3,NoS]-Carr[2,4,NoS]))/l[3]
+  k124 = (0.5*(sign(W[2,4])+1)*W[2,4]*Carr[1,4,NoS]+0.5*(1-sign(W[2,4]))*W[2,4]*Carr[2,4,NoS])/h[2]+(w[2,4]*(Carr[1,4,NoS]-Carr[2,4,NoS]))/h[2]-(0.5*(sign(W[3,4])+1)*W[3,4]*Carr[2,4,NoS]+0.5*(1-sign(W[3,4]))*W[3,4]*Carr[3,4,NoS])/h[2]-(w[3,4]*(Carr[2,4,NoS]-Carr[3,4,NoS]))/h[2]+(0.5*(sign(U[2,4])+1)*U[2,4]*Carr[2,3,NoS]+0.5*(1-sign(U[2,4]))*U[2,4]*Carr[2,4,NoS])/l[4]+(u[2,4]*(Carr[2,3,NoS]-Carr[2,4,NoS]))/l[4]   
+  
+  k131 = (0.5*(sign(W[3,1])+1)*W[3,1]*Carr[2,1,NoS]+0.5*(1-sign(W[3,1]))*W[3,1]*Carr[3,1,NoS])/h[3]+(w[3,1]*(Carr[2,1,NoS]-Carr[3,1,NoS]))/h[3]-(0.5*(sign(W[4,1])+1)*W[4,1]*Carr[3,1,NoS]+0.5*(1-sign(W[4,1]))*W[4,1]*Carr[4,1,NoS])/h[3]-(w[4,1]*(Carr[3,1,NoS]-Carr[4,1,NoS]))/h[3]-(0.5*(sign(U[3,2])+1)*U[3,2]*Carr[3,1,NoS]+0.5*(1-sign(U[3,2]))*U[3,2]*Carr[3,2,NoS])/l[1]- (u[3,2]*(Carr[3,1,NoS]-Carr[3,2,NoS]))/l[1]
+  k132 = (0.5*(sign(W[3,2])+1)*W[3,2]*Carr[2,2,NoS]+0.5*(1-sign(W[3,2]))*W[3,2]*Carr[3,2,NoS])/h[3]+(w[3,2]*(Carr[2,2,NoS]-Carr[3,2,NoS]))/h[3]-(0.5*(sign(W[4,2])+1)*W[4,2]*Carr[3,2,NoS]+0.5*(1-sign(W[4,2]))*W[4,2]*Carr[4,2,NoS])/h[3]-(w[4,2]*(Carr[3,2,NoS]-Carr[4,2,NoS]))/h[3]+(0.5*(sign(U[3,2])+1)*U[3,2]*Carr[3,1,NoS]+0.5*(1-sign(U[3,2]))*U[3,2]*Carr[3,2,NoS])/l[2]+ (u[3,2]*(Carr[3,1,NoS]-Carr[3,2,NoS]))/l[2]-(0.5*(sign(U[3,3])+1)*U[3,3]*Carr[3,2,NoS]+0.5*(1-sign(U[3,3]))*U[3,3]*Carr[3,3,NoS])/l[2]-(u[3,3]*(Carr[3,2,NoS]-Carr[3,3,NoS]))/l[2]
+  k133 = (0.5*(sign(W[3,3])+1)*W[3,3]*Carr[2,3,NoS]+0.5*(1-sign(W[3,3]))*W[3,3]*Carr[3,3,NoS])/h[3]+(w[3,3]*(Carr[2,3,NoS]-Carr[3,3,NoS]))/h[3]-(0.5*(sign(W[4,3])+1)*W[4,3]*Carr[3,3,NoS]+0.5*(1-sign(W[4,3]))*W[4,3]*Carr[4,3,NoS])/h[3]-(w[4,3]*(Carr[3,3,NoS]-Carr[4,3,NoS]))/h[3]+(0.5*(sign(U[3,3])+1)*U[3,3]*Carr[3,2,NoS]+0.5*(1-sign(U[3,3]))*U[3,3]*Carr[3,3,NoS])/l[3]+ (u[3,3]*(Carr[3,2,NoS]-Carr[3,3,NoS]))/l[3]-(0.5*(sign(U[3,4])+1)*U[3,4]*Carr[3,3,NoS]+0.5*(1-sign(U[3,4]))*U[3,4]*Carr[3,4,NoS])/l[3]-(u[3,4]*(Carr[3,3,NoS]-Carr[3,4,NoS]))/l[3]
+  k134 = (0.5*(sign(W[3,4])+1)*W[3,4]*Carr[2,4,NoS]+0.5*(1-sign(W[3,4]))*W[3,4]*Carr[3,4,NoS])/h[3]+(w[3,4]*(Carr[2,4,NoS]-Carr[3,4,NoS]))/h[3]-(0.5*(sign(W[4,4])+1)*W[4,4]*Carr[3,4,NoS]+0.5*(1-sign(W[4,4]))*W[4,4]*Carr[4,4,NoS])/h[3]-(w[4,4]*(Carr[3,4,NoS]-Carr[4,4,NoS]))/h[3]+(0.5*(sign(U[3,4])+1)*U[3,4]*Carr[3,3,NoS]+0.5*(1-sign(U[3,4]))*U[3,4]*Carr[3,4,NoS])/l[4]+ (u[3,4]*(Carr[3,3,NoS]-Carr[3,4,NoS]))/l[4]   
+  
+  k141 = (0.5*(sign(W[4,1])+1)*W[4,1]*Carr[3,1,NoS]+0.5*(1-sign(W[4,1]))*W[4,1]*Carr[4,1,NoS])/h[4]+(w[4,1]*(Carr[3,1,NoS]-Carr[4,1,NoS]))/h[4]-(w[5,1]*(Carr[4,1,NoS]-cBgarr[NoS]))/h[4]-(0.5*(sign(U[4,2])+1)*U[4,2]*Carr[4,1,NoS]+0.5*(1-sign(U[4,2]))*U[4,2]*Carr[4,2,NoS])/l[1]-(u[4,2]*(Carr[4,1,NoS]-Carr[4,2,NoS]))/l[1]
+  k142 = (0.5*(sign(W[4,2])+1)*W[4,2]*Carr[3,2,NoS]+0.5*(1-sign(W[4,2]))*W[4,2]*Carr[4,2,NoS])/h[4]+(w[4,2]*(Carr[3,2,NoS]-Carr[4,2,NoS]))/h[4]-(w[5,2]*(Carr[4,2,NoS]-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,2])+1)*U[4,2]*Carr[4,1,NoS]+0.5*(1-sign(U[4,2]))*U[4,2]*Carr[4,2,NoS])/l[2]+(u[4,2]*(Carr[4,1,NoS]-Carr[4,2,NoS]))/l[2]-(0.5*(sign(U[4,3])+1)*U[4,3]*Carr[4,2,NoS]+0.5*(1-sign(U[4,3]))*U[4,3]*Carr[4,3,NoS])/l[2]-(u[4,3]*(Carr[4,2,NoS]-Carr[4,3,NoS]))/l[2]
+  k143 = (0.5*(sign(W[4,3])+1)*W[4,3]*Carr[3,3,NoS]+0.5*(1-sign(W[4,3]))*W[4,3]*Carr[4,3,NoS])/h[4]+(w[4,3]*(Carr[3,3,NoS]-Carr[4,3,NoS]))/h[4]-(w[5,3]*(Carr[4,3,NoS]-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,3])+1)*U[4,3]*Carr[4,2,NoS]+0.5*(1-sign(U[4,3]))*U[4,3]*Carr[4,3,NoS])/l[3]+(u[4,3]*(Carr[4,2,NoS]-Carr[4,3,NoS]))/l[3]-(0.5*(sign(U[4,4])+1)*U[4,4]*Carr[4,3,NoS]+0.5*(1-sign(U[4,4]))*U[4,4]*Carr[4,4,NoS])/l[3]-(u[4,4]*(Carr[4,3,NoS]-Carr[4,4,NoS]))/l[3]
+  k144 = (0.5*(sign(W[4,4])+1)*W[4,4]*Carr[3,4,NoS]+0.5*(1-sign(W[4,4]))*W[4,4]*Carr[4,4,NoS])/h[4]+(w[4,4]*(Carr[3,4,NoS]-Carr[4,4,NoS]))/h[4]-(w[5,4]*(Carr[4,4,NoS]-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,4])+1)*U[4,4]*Carr[4,3,NoS]+0.5*(1-sign(U[4,4]))*U[4,4]*Carr[4,4,NoS])/l[4]+(u[4,4]*(Carr[4,3,NoS]-Carr[4,4,NoS]))/l[4]  
+  
+  k211 = -(0.5*(sign(W[2,1])+1)*W[2,1]*(Carr[1,1,NoS]+deltaTime*k111/2)+0.5*(1-sign(W[2,1]))*W[2,1]*Carr[2,1,NoS])/h[1]-(w[2,1]*((Carr[1,1,NoS]+deltaTime*k111/2)-Carr[2,1,NoS]))/h[1]-(0.5*(sign(U[1,2])+1)*U[1,2]*(Carr[1,1,NoS]+deltaTime*k111/2)+0.5*(1-sign(U[1,2]))*U[1,2]*Carr[1,2,NoS])/l[1]-(u[1,2]*((Carr[1,1,NoS]+deltaTime*k111/2)-Carr[1,2,NoS]))/l[1]
+  k212 = -(0.5*(sign(W[2,2])+1)*W[2,2]*(Carr[1,2,NoS]+deltaTime*k112/2)+0.5*(1-sign(W[2,2]))*W[2,2]*Carr[2,2,NoS])/h[1]-(w[2,2]*((Carr[1,2,NoS]+deltaTime*k112/2)-Carr[2,2,NoS]))/h[1]+(0.5*(sign(U[1,2])+1)*U[1,2]*Carr[1,1,NoS]+0.5*(1-sign(U[1,2]))*U[1,2]*(Carr[1,2,NoS]+deltaTime*k112/2))/l[2]+(u[1,2]*(Carr[1,1,NoS]-(Carr[1,2,NoS]+deltaTime*k112/2)))/l[2]-(0.5*(sign(U[1,3])+1)*U[1,3]*(Carr[1,2,NoS]+deltaTime*k112/2)+0.5*(1-sign(U[1,3]))*U[1,3]*Carr[1,3,NoS])/l[2]-(u[1,3]*((Carr[1,2,NoS]+deltaTime*k112/2)-Carr[1,3,NoS]))/l[2]
+  k213 = -(0.5*(sign(W[2,3])+1)*W[2,3]*(Carr[1,3,NoS]+deltaTime*k113/2)+0.5*(1-sign(W[2,3]))*W[2,3]*Carr[2,3,NoS])/h[1]-(w[2,3]*((Carr[1,3,NoS]+deltaTime*k113/2)-Carr[2,3,NoS]))/h[1]+(0.5*(sign(U[1,3])+1)*U[1,3]*Carr[1,2,NoS]+0.5*(1-sign(U[1,3]))*U[1,3]*(Carr[1,3,NoS]+deltaTime*k113/2))/l[3]+(u[1,3]*(Carr[1,2,NoS]-(Carr[1,3,NoS]+deltaTime*k113/2)))/l[3]-(0.5*(sign(U[1,4])+1)*U[1,4]*(Carr[1,3,NoS]+deltaTime*k113/2)+0.5*(1-sign(U[1,4]))*U[1,4]*Carr[1,4,NoS])/l[3]-(u[1,4]*((Carr[1,3,NoS]+deltaTime*k113/2)-Carr[1,4,NoS]))/l[3]
+  k214 = -(0.5*(sign(W[2,4])+1)*W[2,4]*(Carr[1,4,NoS]+deltaTime*k114/2)+0.5*(1-sign(W[2,4]))*W[2,4]*Carr[2,4,NoS])/h[1]-(w[2,4]*((Carr[1,4,NoS]+deltaTime*k114/2)-Carr[2,4,NoS]))/h[1]+(0.5*(sign(U[1,4])+1)*U[1,4]*Carr[1,3,NoS]+0.5*(1-sign(U[1,4]))*U[1,4]*(Carr[1,4,NoS]+deltaTime*k114/2))/l[4]+(u[1,4]*(Carr[1,3,NoS]-(Carr[1,4,NoS]+deltaTime*k114/2)))/l[4]
+  
+  k221 = (0.5*(sign(W[2,1])+1)*W[2,1]*Carr[1,1,NoS]+0.5*(1-sign(W[2,1]))*W[2,1]*(Carr[2,1,NoS]+deltaTime*k121/2))/h[2]+(w[2,1]*(Carr[1,1,NoS]-(Carr[2,1,NoS]+deltaTime*k121/2)))/h[2]-(0.5*(sign(W[3,1])+1)*W[3,1]*(Carr[2,1,NoS]+deltaTime*k121/2)+0.5*(1-sign(W[3,1]))*W[3,1]*Carr[3,1,NoS])/h[2]-(w[3,1]*((Carr[2,1,NoS]+deltaTime*k121/2)-Carr[3,1,NoS]))/h[2]-(0.5*(sign(U[2,2])+1)*U[2,2]*(Carr[2,1,NoS]+deltaTime*k121/2)+0.5*(1-sign(U[2,2]))*U[2,2]*Carr[2,2,NoS])/l[1]-(u[2,2]*((Carr[2,1,NoS]+deltaTime*k121/2)-Carr[2,2,NoS]))/l[1]
+  k222 = (0.5*(sign(W[2,2])+1)*W[2,2]*Carr[1,2,NoS]+0.5*(1-sign(W[2,2]))*W[2,2]*(Carr[2,2,NoS]+deltaTime*k122/2))/h[2]+(w[2,2]*(Carr[1,2,NoS]-(Carr[2,2,NoS]+deltaTime*k122/2)))/h[2]-(0.5*(sign(W[3,2])+1)*W[3,2]*(Carr[2,2,NoS]+deltaTime*k122/2)+0.5*(1-sign(W[3,2]))*W[3,2]*Carr[3,2,NoS])/h[2]-(w[3,2]*((Carr[2,2,NoS]+deltaTime*k122/2)-Carr[3,2,NoS]))/h[2]+(0.5*(sign(U[2,2])+1)*U[2,2]*Carr[2,1,NoS]+0.5*(1-sign(U[2,2]))*U[2,2]*(Carr[2,2,NoS]+deltaTime*k122/2))/l[2]+(u[2,2]*(Carr[2,1,NoS]-(Carr[2,2,NoS]+deltaTime*k122/2)))/l[2]-(0.5*(sign(U[2,3])+1)*U[2,3]*(Carr[2,2,NoS]+deltaTime*k122/2)+0.5*(1-sign(U[2,3]))*U[2,3]*Carr[2,3,NoS])/l[2]-(u[2,3]*((Carr[2,2,NoS]+deltaTime*k122/2)-Carr[2,3,NoS]))/l[2]
+  k223 = (0.5*(sign(W[2,3])+1)*W[2,3]*Carr[1,3,NoS]+0.5*(1-sign(W[2,3]))*W[2,3]*(Carr[2,3,NoS]+deltaTime*k123/2))/h[2]+(w[2,3]*(Carr[1,3,NoS]-(Carr[2,3,NoS]+deltaTime*k123/2)))/h[2]-(0.5*(sign(W[3,3])+1)*W[3,3]*(Carr[2,3,NoS]+deltaTime*k123/2)+0.5*(1-sign(W[3,3]))*W[3,3]*Carr[3,3,NoS])/h[2]-(w[3,3]*((Carr[2,3,NoS]+deltaTime*k123/2)-Carr[3,3,NoS]))/h[2]+(0.5*(sign(U[2,3])+1)*U[2,3]*Carr[2,2,NoS]+0.5*(1-sign(U[2,3]))*U[2,3]*(Carr[2,3,NoS]+deltaTime*k123/2))/l[3]+(u[2,3]*(Carr[2,2,NoS]-(Carr[2,3,NoS]+deltaTime*k123/2)))/l[3]-(0.5*(sign(U[2,4])+1)*U[2,4]*(Carr[2,3,NoS]+deltaTime*k123/2)+0.5*(1-sign(U[2,4]))*U[2,4]*Carr[2,4,NoS])/l[3]-(u[2,4]*((Carr[2,3,NoS]+deltaTime*k123/2)-Carr[2,4,NoS]))/l[3]
+  k224 = (0.5*(sign(W[2,4])+1)*W[2,4]*Carr[1,4,NoS]+0.5*(1-sign(W[2,4]))*W[2,4]*(Carr[2,4,NoS]+deltaTime*k124/2))/h[2]+(w[2,4]*(Carr[1,4,NoS]-(Carr[2,4,NoS]+deltaTime*k124/2)))/h[2]-(0.5*(sign(W[3,4])+1)*W[3,4]*(Carr[2,4,NoS]+deltaTime*k124/2)+0.5*(1-sign(W[3,4]))*W[3,4]*Carr[3,4,NoS])/h[2]-(w[3,4]*((Carr[2,4,NoS]+deltaTime*k124/2)-Carr[3,4,NoS]))/h[2]+(0.5*(sign(U[2,4])+1)*U[2,4]*Carr[2,3,NoS]+0.5*(1-sign(U[2,4]))*U[2,4]*(Carr[2,4,NoS]+deltaTime*k124/2))/l[4]+(u[2,4]*(Carr[2,3,NoS]-(Carr[2,4,NoS]+deltaTime*k124/2)))/l[4]   
+  
+  k231 = (0.5*(sign(W[3,1])+1)*W[3,1]*Carr[2,1,NoS]+0.5*(1-sign(W[3,1]))*W[3,1]*(Carr[3,1,NoS]+deltaTime*k131/2))/h[3]+(w[3,1]*(Carr[2,1,NoS]-(Carr[3,1,NoS]+deltaTime*k131/2)))/h[3]-(0.5*(sign(W[4,1])+1)*W[4,1]*(Carr[3,1,NoS]+deltaTime*k131/2)+0.5*(1-sign(W[4,1]))*W[4,1]*Carr[4,1,NoS])/h[3]-(w[4,1]*((Carr[3,1,NoS]+deltaTime*k131/2)-Carr[4,1,NoS]))/h[3]-(0.5*(sign(U[3,2])+1)*U[3,2]*(Carr[3,1,NoS]+deltaTime*k131/2)+0.5*(1-sign(U[3,2]))*U[3,2]*Carr[3,2,NoS])/l[1]- (u[3,2]*((Carr[3,1,NoS]+deltaTime*k131/2)-Carr[3,2,NoS]))/l[1]
+  k232 = (0.5*(sign(W[3,2])+1)*W[3,2]*Carr[2,2,NoS]+0.5*(1-sign(W[3,2]))*W[3,2]*(Carr[3,2,NoS]+deltaTime*k132/2))/h[3]+(w[3,2]*(Carr[2,2,NoS]-(Carr[3,2,NoS]+deltaTime*k132/2)))/h[3]-(0.5*(sign(W[4,2])+1)*W[4,2]*(Carr[3,2,NoS]+deltaTime*k132/2)+0.5*(1-sign(W[4,2]))*W[4,2]*Carr[4,2,NoS])/h[3]-(w[4,2]*((Carr[3,2,NoS]+deltaTime*k132/2)-Carr[4,2,NoS]))/h[3]+(0.5*(sign(U[3,2])+1)*U[3,2]*Carr[3,1,NoS]+0.5*(1-sign(U[3,2]))*U[3,2]*(Carr[3,2,NoS]+deltaTime*k132/2))/l[2]+ (u[3,2]*(Carr[3,1,NoS]-(Carr[3,2,NoS]+deltaTime*k132/2)))/l[2]-(0.5*(sign(U[3,3])+1)*U[3,3]*(Carr[3,2,NoS]+deltaTime*k132/2)+0.5*(1-sign(U[3,3]))*U[3,3]*Carr[3,3,NoS])/l[2]-(u[3,3]*((Carr[3,2,NoS]+deltaTime*k132/2)-Carr[3,3,NoS]))/l[2]
+  k233 = (0.5*(sign(W[3,3])+1)*W[3,3]*Carr[2,3,NoS]+0.5*(1-sign(W[3,3]))*W[3,3]*(Carr[3,3,NoS]+deltaTime*k133/2))/h[3]+(w[3,3]*(Carr[2,3,NoS]-(Carr[3,3,NoS]+deltaTime*k133/2)))/h[3]-(0.5*(sign(W[4,3])+1)*W[4,3]*(Carr[3,3,NoS]+deltaTime*k133/2)+0.5*(1-sign(W[4,3]))*W[4,3]*Carr[4,3,NoS])/h[3]-(w[4,3]*((Carr[3,3,NoS]+deltaTime*k133/2)-Carr[4,3,NoS]))/h[3]+(0.5*(sign(U[3,3])+1)*U[3,3]*Carr[3,2,NoS]+0.5*(1-sign(U[3,3]))*U[3,3]*(Carr[3,3,NoS]+deltaTime*k133/2))/l[3]+ (u[3,3]*(Carr[3,2,NoS]-(Carr[3,3,NoS]+deltaTime*k133/2)))/l[3]-(0.5*(sign(U[3,4])+1)*U[3,4]*(Carr[3,3,NoS]+deltaTime*k133/2)+0.5*(1-sign(U[3,4]))*U[3,4]*Carr[3,4,NoS])/l[3]-(u[3,4]*((Carr[3,3,NoS]+deltaTime*k133/2)-Carr[3,4,NoS]))/l[3]
+  k234 = (0.5*(sign(W[3,4])+1)*W[3,4]*Carr[2,4,NoS]+0.5*(1-sign(W[3,4]))*W[3,4]*(Carr[3,4,NoS]+deltaTime*k134/2))/h[3]+(w[3,4]*(Carr[2,4,NoS]-(Carr[3,4,NoS]+deltaTime*k134/2)))/h[3]-(0.5*(sign(W[4,4])+1)*W[4,4]*(Carr[3,4,NoS]+deltaTime*k134/2)+0.5*(1-sign(W[4,4]))*W[4,4]*Carr[4,4,NoS])/h[3]-(w[4,4]*((Carr[3,4,NoS]+deltaTime*k134/2)-Carr[4,4,NoS]))/h[3]+(0.5*(sign(U[3,4])+1)*U[3,4]*Carr[3,3,NoS]+0.5*(1-sign(U[3,4]))*U[3,4]*(Carr[3,4,NoS]+deltaTime*k134/2))/l[4]+ (u[3,4]*(Carr[3,3,NoS]-(Carr[3,4,NoS]+deltaTime*k134/2)))/l[4]   
+  
+  k241 = (0.5*(sign(W[4,1])+1)*W[4,1]*Carr[3,1,NoS]+0.5*(1-sign(W[4,1]))*W[4,1]*(Carr[4,1,NoS]+deltaTime*k141/2))/h[4]+(w[4,1]*(Carr[3,1,NoS]-(Carr[4,1,NoS]+deltaTime*k141/2)))/h[4]-(w[5,1]*((Carr[4,1,NoS]+deltaTime*k141/2)-cBgarr[NoS]))/h[4]-(0.5*(sign(U[4,2])+1)*U[4,2]*(Carr[4,1,NoS]+deltaTime*k141/2)+0.5*(1-sign(U[4,2]))*U[4,2]*Carr[4,2,NoS])/l[1]-(u[4,2]*((Carr[4,1,NoS]+deltaTime*k141/2)-Carr[4,2,NoS]))/l[1]
+  k242 = (0.5*(sign(W[4,2])+1)*W[4,2]*Carr[3,2,NoS]+0.5*(1-sign(W[4,2]))*W[4,2]*(Carr[4,2,NoS]+deltaTime*k142/2))/h[4]+(w[4,2]*(Carr[3,2,NoS]-(Carr[4,2,NoS]+deltaTime*k142/2)))/h[4]-(w[5,2]*((Carr[4,2,NoS]+deltaTime*k142/2)-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,2])+1)*U[4,2]*Carr[4,1,NoS]+0.5*(1-sign(U[4,2]))*U[4,2]*(Carr[4,2,NoS]+deltaTime*k142/2))/l[2]+(u[4,2]*(Carr[4,1,NoS]-(Carr[4,2,NoS]+deltaTime*k142/2)))/l[2]-(0.5*(sign(U[4,3])+1)*U[4,3]*(Carr[4,2,NoS]+deltaTime*k142/2)+0.5*(1-sign(U[4,3]))*U[4,3]*Carr[4,3,NoS])/l[2]-(u[4,3]*((Carr[4,2,NoS]+deltaTime*k142/2)-Carr[4,3,NoS]))/l[2]
+  k243 = (0.5*(sign(W[4,3])+1)*W[4,3]*Carr[3,3,NoS]+0.5*(1-sign(W[4,3]))*W[4,3]*(Carr[4,3,NoS]+deltaTime*k143/2))/h[4]+(w[4,3]*(Carr[3,3,NoS]-(Carr[4,3,NoS]+deltaTime*k143/2)))/h[4]-(w[5,3]*((Carr[4,3,NoS]+deltaTime*k143/2)-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,3])+1)*U[4,3]*Carr[4,2,NoS]+0.5*(1-sign(U[4,3]))*U[4,3]*(Carr[4,3,NoS]+deltaTime*k143/2))/l[3]+(u[4,3]*(Carr[4,2,NoS]-(Carr[4,3,NoS]+deltaTime*k143/2)))/l[3]-(0.5*(sign(U[4,4])+1)*U[4,4]*(Carr[4,3,NoS]+deltaTime*k143/2)+0.5*(1-sign(U[4,4]))*U[4,4]*Carr[4,4,NoS])/l[3]-(u[4,4]*((Carr[4,3,NoS]+deltaTime*k143/2)-Carr[4,4,NoS]))/l[3]
+  k244 = (0.5*(sign(W[4,4])+1)*W[4,4]*Carr[3,4,NoS]+0.5*(1-sign(W[4,4]))*W[4,4]*(Carr[4,4,NoS]+deltaTime*k144/2))/h[4]+(w[4,4]*(Carr[3,4,NoS]-(Carr[4,4,NoS]+deltaTime*k144/2)))/h[4]-(w[5,4]*((Carr[4,4,NoS]+deltaTime*k144/2)-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,4])+1)*U[4,4]*Carr[4,3,NoS]+0.5*(1-sign(U[4,4]))*U[4,4]*(Carr[4,4,NoS]+deltaTime*k144/2))/l[4]+(u[4,4]*(Carr[4,3,NoS]-(Carr[4,4,NoS]+deltaTime*k144/2)))/l[4]  
+  
+  k311 = -(0.5*(sign(W[2,1])+1)*W[2,1]*(Carr[1,1,NoS]+deltaTime*k211/2)+0.5*(1-sign(W[2,1]))*W[2,1]*Carr[2,1,NoS])/h[1]-(w[2,1]*((Carr[1,1,NoS]+deltaTime*k211/2)-Carr[2,1,NoS]))/h[1]-(0.5*(sign(U[1,2])+1)*U[1,2]*(Carr[1,1,NoS]+deltaTime*k211/2)+0.5*(1-sign(U[1,2]))*U[1,2]*Carr[1,2,NoS])/l[1]-(u[1,2]*((Carr[1,1,NoS]+deltaTime*k211/2)-Carr[1,2,NoS]))/l[1]
+  k312 = -(0.5*(sign(W[2,2])+1)*W[2,2]*(Carr[1,2,NoS]+deltaTime*k212/2)+0.5*(1-sign(W[2,2]))*W[2,2]*Carr[2,2,NoS])/h[1]-(w[2,2]*((Carr[1,2,NoS]+deltaTime*k212/2)-Carr[2,2,NoS]))/h[1]+(0.5*(sign(U[1,2])+1)*U[1,2]*Carr[1,1,NoS]+0.5*(1-sign(U[1,2]))*U[1,2]*(Carr[1,2,NoS]+deltaTime*k212/2))/l[2]+(u[1,2]*(Carr[1,1,NoS]-(Carr[1,2,NoS]+deltaTime*k212/2)))/l[2]-(0.5*(sign(U[1,3])+1)*U[1,3]*(Carr[1,2,NoS]+deltaTime*k212/2)+0.5*(1-sign(U[1,3]))*U[1,3]*Carr[1,3,NoS])/l[2]-(u[1,3]*((Carr[1,2,NoS]+deltaTime*k212/2)-Carr[1,3,NoS]))/l[2]
+  k313 = -(0.5*(sign(W[2,3])+1)*W[2,3]*(Carr[1,3,NoS]+deltaTime*k213/2)+0.5*(1-sign(W[2,3]))*W[2,3]*Carr[2,3,NoS])/h[1]-(w[2,3]*((Carr[1,3,NoS]+deltaTime*k213/2)-Carr[2,3,NoS]))/h[1]+(0.5*(sign(U[1,3])+1)*U[1,3]*Carr[1,2,NoS]+0.5*(1-sign(U[1,3]))*U[1,3]*(Carr[1,3,NoS]+deltaTime*k213/2))/l[3]+(u[1,3]*(Carr[1,2,NoS]-(Carr[1,3,NoS]+deltaTime*k213/2)))/l[3]-(0.5*(sign(U[1,4])+1)*U[1,4]*(Carr[1,3,NoS]+deltaTime*k213/2)+0.5*(1-sign(U[1,4]))*U[1,4]*Carr[1,4,NoS])/l[3]-(u[1,4]*((Carr[1,3,NoS]+deltaTime*k213/2)-Carr[1,4,NoS]))/l[3]
+  k314 = -(0.5*(sign(W[2,4])+1)*W[2,4]*(Carr[1,4,NoS]+deltaTime*k214/2)+0.5*(1-sign(W[2,4]))*W[2,4]*Carr[2,4,NoS])/h[1]-(w[2,4]*((Carr[1,4,NoS]+deltaTime*k214/2)-Carr[2,4,NoS]))/h[1]+(0.5*(sign(U[1,4])+1)*U[1,4]*Carr[1,3,NoS]+0.5*(1-sign(U[1,4]))*U[1,4]*(Carr[1,4,NoS]+deltaTime*k214/2))/l[4]+(u[1,4]*(Carr[1,3,NoS]-(Carr[1,4,NoS]+deltaTime*k214/2)))/l[4]
+  
+  k321 = (0.5*(sign(W[2,1])+1)*W[2,1]*Carr[1,1,NoS]+0.5*(1-sign(W[2,1]))*W[2,1]*(Carr[2,1,NoS]+deltaTime*k221/2))/h[2]+(w[2,1]*(Carr[1,1,NoS]-(Carr[2,1,NoS]+deltaTime*k221/2)))/h[2]-(0.5*(sign(W[3,1])+1)*W[3,1]*(Carr[2,1,NoS]+deltaTime*k221/2)+0.5*(1-sign(W[3,1]))*W[3,1]*Carr[3,1,NoS])/h[2]-(w[3,1]*((Carr[2,1,NoS]+deltaTime*k221/2)-Carr[3,1,NoS]))/h[2]-(0.5*(sign(U[2,2])+1)*U[2,2]*(Carr[2,1,NoS]+deltaTime*k221/2)+0.5*(1-sign(U[2,2]))*U[2,2]*Carr[2,2,NoS])/l[1]-(u[2,2]*((Carr[2,1,NoS]+deltaTime*k221/2)-Carr[2,2,NoS]))/l[1]
+  k322 = (0.5*(sign(W[2,2])+1)*W[2,2]*Carr[1,2,NoS]+0.5*(1-sign(W[2,2]))*W[2,2]*(Carr[2,2,NoS]+deltaTime*k222/2))/h[2]+(w[2,2]*(Carr[1,2,NoS]-(Carr[2,2,NoS]+deltaTime*k222/2)))/h[2]-(0.5*(sign(W[3,2])+1)*W[3,2]*(Carr[2,2,NoS]+deltaTime*k222/2)+0.5*(1-sign(W[3,2]))*W[3,2]*Carr[3,2,NoS])/h[2]-(w[3,2]*((Carr[2,2,NoS]+deltaTime*k222/2)-Carr[3,2,NoS]))/h[2]+(0.5*(sign(U[2,2])+1)*U[2,2]*Carr[2,1,NoS]+0.5*(1-sign(U[2,2]))*U[2,2]*(Carr[2,2,NoS]+deltaTime*k222/2))/l[2]+(u[2,2]*(Carr[2,1,NoS]-(Carr[2,2,NoS]+deltaTime*k222/2)))/l[2]-(0.5*(sign(U[2,3])+1)*U[2,3]*(Carr[2,2,NoS]+deltaTime*k222/2)+0.5*(1-sign(U[2,3]))*U[2,3]*Carr[2,3,NoS])/l[2]-(u[2,3]*((Carr[2,2,NoS]+deltaTime*k222/2)-Carr[2,3,NoS]))/l[2]
+  k323 = (0.5*(sign(W[2,3])+1)*W[2,3]*Carr[1,3,NoS]+0.5*(1-sign(W[2,3]))*W[2,3]*(Carr[2,3,NoS]+deltaTime*k223/2))/h[2]+(w[2,3]*(Carr[1,3,NoS]-(Carr[2,3,NoS]+deltaTime*k223/2)))/h[2]-(0.5*(sign(W[3,3])+1)*W[3,3]*(Carr[2,3,NoS]+deltaTime*k223/2)+0.5*(1-sign(W[3,3]))*W[3,3]*Carr[3,3,NoS])/h[2]-(w[3,3]*((Carr[2,3,NoS]+deltaTime*k223/2)-Carr[3,3,NoS]))/h[2]+(0.5*(sign(U[2,3])+1)*U[2,3]*Carr[2,2,NoS]+0.5*(1-sign(U[2,3]))*U[2,3]*(Carr[2,3,NoS]+deltaTime*k223/2))/l[3]+(u[2,3]*(Carr[2,2,NoS]-(Carr[2,3,NoS]+deltaTime*k223/2)))/l[3]-(0.5*(sign(U[2,4])+1)*U[2,4]*(Carr[2,3,NoS]+deltaTime*k223/2)+0.5*(1-sign(U[2,4]))*U[2,4]*Carr[2,4,NoS])/l[3]-(u[2,4]*((Carr[2,3,NoS]+deltaTime*k223/2)-Carr[2,4,NoS]))/l[3]
+  k324 = (0.5*(sign(W[2,4])+1)*W[2,4]*Carr[1,4,NoS]+0.5*(1-sign(W[2,4]))*W[2,4]*(Carr[2,4,NoS]+deltaTime*k224/2))/h[2]+(w[2,4]*(Carr[1,4,NoS]-(Carr[2,4,NoS]+deltaTime*k224/2)))/h[2]-(0.5*(sign(W[3,4])+1)*W[3,4]*(Carr[2,4,NoS]+deltaTime*k224/2)+0.5*(1-sign(W[3,4]))*W[3,4]*Carr[3,4,NoS])/h[2]-(w[3,4]*((Carr[2,4,NoS]+deltaTime*k224/2)-Carr[3,4,NoS]))/h[2]+(0.5*(sign(U[2,4])+1)*U[2,4]*Carr[2,3,NoS]+0.5*(1-sign(U[2,4]))*U[2,4]*(Carr[2,4,NoS]+deltaTime*k224/2))/l[4]+(u[2,4]*(Carr[2,3,NoS]-(Carr[2,4,NoS]+deltaTime*k224/2)))/l[4]   
+  
+  k331 = (0.5*(sign(W[3,1])+1)*W[3,1]*Carr[2,1,NoS]+0.5*(1-sign(W[3,1]))*W[3,1]*(Carr[3,1,NoS]+deltaTime*k231/2))/h[3]+(w[3,1]*(Carr[2,1,NoS]-(Carr[3,1,NoS]+deltaTime*k231/2)))/h[3]-(0.5*(sign(W[4,1])+1)*W[4,1]*(Carr[3,1,NoS]+deltaTime*k231/2)+0.5*(1-sign(W[4,1]))*W[4,1]*Carr[4,1,NoS])/h[3]-(w[4,1]*((Carr[3,1,NoS]+deltaTime*k231/2)-Carr[4,1,NoS]))/h[3]-(0.5*(sign(U[3,2])+1)*U[3,2]*(Carr[3,1,NoS]+deltaTime*k231/2)+0.5*(1-sign(U[3,2]))*U[3,2]*Carr[3,2,NoS])/l[1]- (u[3,2]*((Carr[3,1,NoS]+deltaTime*k231/2)-Carr[3,2,NoS]))/l[1]
+  k332 = (0.5*(sign(W[3,2])+1)*W[3,2]*Carr[2,2,NoS]+0.5*(1-sign(W[3,2]))*W[3,2]*(Carr[3,2,NoS]+deltaTime*k232/2))/h[3]+(w[3,2]*(Carr[2,2,NoS]-(Carr[3,2,NoS]+deltaTime*k232/2)))/h[3]-(0.5*(sign(W[4,2])+1)*W[4,2]*(Carr[3,2,NoS]+deltaTime*k232/2)+0.5*(1-sign(W[4,2]))*W[4,2]*Carr[4,2,NoS])/h[3]-(w[4,2]*((Carr[3,2,NoS]+deltaTime*k232/2)-Carr[4,2,NoS]))/h[3]+(0.5*(sign(U[3,2])+1)*U[3,2]*Carr[3,1,NoS]+0.5*(1-sign(U[3,2]))*U[3,2]*(Carr[3,2,NoS]+deltaTime*k232/2))/l[2]+ (u[3,2]*(Carr[3,1,NoS]-(Carr[3,2,NoS]+deltaTime*k232/2)))/l[2]-(0.5*(sign(U[3,3])+1)*U[3,3]*(Carr[3,2,NoS]+deltaTime*k232/2)+0.5*(1-sign(U[3,3]))*U[3,3]*Carr[3,3,NoS])/l[2]-(u[3,3]*((Carr[3,2,NoS]+deltaTime*k232/2)-Carr[3,3,NoS]))/l[2]
+  k333 = (0.5*(sign(W[3,3])+1)*W[3,3]*Carr[2,3,NoS]+0.5*(1-sign(W[3,3]))*W[3,3]*(Carr[3,3,NoS]+deltaTime*k233/2))/h[3]+(w[3,3]*(Carr[2,3,NoS]-(Carr[3,3,NoS]+deltaTime*k233/2)))/h[3]-(0.5*(sign(W[4,3])+1)*W[4,3]*(Carr[3,3,NoS]+deltaTime*k233/2)+0.5*(1-sign(W[4,3]))*W[4,3]*Carr[4,3,NoS])/h[3]-(w[4,3]*((Carr[3,3,NoS]+deltaTime*k233/2)-Carr[4,3,NoS]))/h[3]+(0.5*(sign(U[3,3])+1)*U[3,3]*Carr[3,2,NoS]+0.5*(1-sign(U[3,3]))*U[3,3]*(Carr[3,3,NoS]+deltaTime*k233/2))/l[3]+ (u[3,3]*(Carr[3,2,NoS]-(Carr[3,3,NoS]+deltaTime*k233/2)))/l[3]-(0.5*(sign(U[3,4])+1)*U[3,4]*(Carr[3,3,NoS]+deltaTime*k233/2)+0.5*(1-sign(U[3,4]))*U[3,4]*Carr[3,4,NoS])/l[3]-(u[3,4]*((Carr[3,3,NoS]+deltaTime*k233/2)-Carr[3,4,NoS]))/l[3]
+  k334 = (0.5*(sign(W[3,4])+1)*W[3,4]*Carr[2,4,NoS]+0.5*(1-sign(W[3,4]))*W[3,4]*(Carr[3,4,NoS]+deltaTime*k234/2))/h[3]+(w[3,4]*(Carr[2,4,NoS]-(Carr[3,4,NoS]+deltaTime*k234/2)))/h[3]-(0.5*(sign(W[4,4])+1)*W[4,4]*(Carr[3,4,NoS]+deltaTime*k234/2)+0.5*(1-sign(W[4,4]))*W[4,4]*Carr[4,4,NoS])/h[3]-(w[4,4]*((Carr[3,4,NoS]+deltaTime*k234/2)-Carr[4,4,NoS]))/h[3]+(0.5*(sign(U[3,4])+1)*U[3,4]*Carr[3,3,NoS]+0.5*(1-sign(U[3,4]))*U[3,4]*(Carr[3,4,NoS]+deltaTime*k234/2))/l[4]+ (u[3,4]*(Carr[3,3,NoS]-(Carr[3,4,NoS]+deltaTime*k234/2)))/l[4]   
+  
+  k341 = (0.5*(sign(W[4,1])+1)*W[4,1]*Carr[3,1,NoS]+0.5*(1-sign(W[4,1]))*W[4,1]*(Carr[4,1,NoS]+deltaTime*k241/2))/h[4]+(w[4,1]*(Carr[3,1,NoS]-(Carr[4,1,NoS]+deltaTime*k241/2)))/h[4]-(w[5,1]*((Carr[4,1,NoS]+deltaTime*k241/2)-cBgarr[NoS]))/h[4]-(0.5*(sign(U[4,2])+1)*U[4,2]*(Carr[4,1,NoS]+deltaTime*k241/2)+0.5*(1-sign(U[4,2]))*U[4,2]*Carr[4,2,NoS])/l[1]-(u[4,2]*((Carr[4,1,NoS]+deltaTime*k241/2)-Carr[4,2,NoS]))/l[1]
+  k342 = (0.5*(sign(W[4,2])+1)*W[4,2]*Carr[3,2,NoS]+0.5*(1-sign(W[4,2]))*W[4,2]*(Carr[4,2,NoS]+deltaTime*k242/2))/h[4]+(w[4,2]*(Carr[3,2,NoS]-(Carr[4,2,NoS]+deltaTime*k242/2)))/h[4]-(w[5,2]*((Carr[4,2,NoS]+deltaTime*k242/2)-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,2])+1)*U[4,2]*Carr[4,1,NoS]+0.5*(1-sign(U[4,2]))*U[4,2]*(Carr[4,2,NoS]+deltaTime*k242/2))/l[2]+(u[4,2]*(Carr[4,1,NoS]-(Carr[4,2,NoS]+deltaTime*k242/2)))/l[2]-(0.5*(sign(U[4,3])+1)*U[4,3]*(Carr[4,2,NoS]+deltaTime*k242/2)+0.5*(1-sign(U[4,3]))*U[4,3]*Carr[4,3,NoS])/l[2]-(u[4,3]*((Carr[4,2,NoS]+deltaTime*k242/2)-Carr[4,3,NoS]))/l[2]
+  k343 = (0.5*(sign(W[4,3])+1)*W[4,3]*Carr[3,3,NoS]+0.5*(1-sign(W[4,3]))*W[4,3]*(Carr[4,3,NoS]+deltaTime*k243/2))/h[4]+(w[4,3]*(Carr[3,3,NoS]-(Carr[4,3,NoS]+deltaTime*k243/2)))/h[4]-(w[5,3]*((Carr[4,3,NoS]+deltaTime*k243/2)-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,3])+1)*U[4,3]*Carr[4,2,NoS]+0.5*(1-sign(U[4,3]))*U[4,3]*(Carr[4,3,NoS]+deltaTime*k243/2))/l[3]+(u[4,3]*(Carr[4,2,NoS]-(Carr[4,3,NoS]+deltaTime*k243/2)))/l[3]-(0.5*(sign(U[4,4])+1)*U[4,4]*(Carr[4,3,NoS]+deltaTime*k243/2)+0.5*(1-sign(U[4,4]))*U[4,4]*Carr[4,4,NoS])/l[3]-(u[4,4]*((Carr[4,3,NoS]+deltaTime*k243/2)-Carr[4,4,NoS]))/l[3]
+  k344 = (0.5*(sign(W[4,4])+1)*W[4,4]*Carr[3,4,NoS]+0.5*(1-sign(W[4,4]))*W[4,4]*(Carr[4,4,NoS]+deltaTime*k244/2))/h[4]+(w[4,4]*(Carr[3,4,NoS]-(Carr[4,4,NoS]+deltaTime*k244/2)))/h[4]-(w[5,4]*((Carr[4,4,NoS]+deltaTime*k244/2)-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,4])+1)*U[4,4]*Carr[4,3,NoS]+0.5*(1-sign(U[4,4]))*U[4,4]*(Carr[4,4,NoS]+deltaTime*k244/2))/l[4]+(u[4,4]*(Carr[4,3,NoS]-(Carr[4,4,NoS]+deltaTime*k244/2)))/l[4]  
+  
+  k411 = -(0.5*(sign(W[2,1])+1)*W[2,1]*(Carr[1,1,NoS]+deltaTime*k311)+0.5*(1-sign(W[2,1]))*W[2,1]*Carr[2,1,NoS])/h[1]-(w[2,1]*((Carr[1,1,NoS]+deltaTime*k311)-Carr[2,1,NoS]))/h[1]-(0.5*(sign(U[1,2])+1)*U[1,2]*(Carr[1,1,NoS]+deltaTime*k311)+0.5*(1-sign(U[1,2]))*U[1,2]*Carr[1,2,NoS])/l[1]-(u[1,2]*((Carr[1,1,NoS]+deltaTime*k311)-Carr[1,2,NoS]))/l[1]
+  k412 = -(0.5*(sign(W[2,2])+1)*W[2,2]*(Carr[1,2,NoS]+deltaTime*k312)+0.5*(1-sign(W[2,2]))*W[2,2]*Carr[2,2,NoS])/h[1]-(w[2,2]*((Carr[1,2,NoS]+deltaTime*k312)-Carr[2,2,NoS]))/h[1]+(0.5*(sign(U[1,2])+1)*U[1,2]*Carr[1,1,NoS]+0.5*(1-sign(U[1,2]))*U[1,2]*(Carr[1,2,NoS]+deltaTime*k312))/l[2]+(u[1,2]*(Carr[1,1,NoS]-(Carr[1,2,NoS]+deltaTime*k312)))/l[2]-(0.5*(sign(U[1,3])+1)*U[1,3]*(Carr[1,2,NoS]+deltaTime*k312)+0.5*(1-sign(U[1,3]))*U[1,3]*Carr[1,3,NoS])/l[2]-(u[1,3]*((Carr[1,2,NoS]+deltaTime*k312)-Carr[1,3,NoS]))/l[2]
+  k413 = -(0.5*(sign(W[2,3])+1)*W[2,3]*(Carr[1,3,NoS]+deltaTime*k313)+0.5*(1-sign(W[2,3]))*W[2,3]*Carr[2,3,NoS])/h[1]-(w[2,3]*((Carr[1,3,NoS]+deltaTime*k313)-Carr[2,3,NoS]))/h[1]+(0.5*(sign(U[1,3])+1)*U[1,3]*Carr[1,2,NoS]+0.5*(1-sign(U[1,3]))*U[1,3]*(Carr[1,3,NoS]+deltaTime*k313))/l[3]+(u[1,3]*(Carr[1,2,NoS]-(Carr[1,3,NoS]+deltaTime*k313)))/l[3]-(0.5*(sign(U[1,4])+1)*U[1,4]*(Carr[1,3,NoS]+deltaTime*k313)+0.5*(1-sign(U[1,4]))*U[1,4]*Carr[1,4,NoS])/l[3]-(u[1,4]*((Carr[1,3,NoS]+deltaTime*k313)-Carr[1,4,NoS]))/l[3]
+  k414 = -(0.5*(sign(W[2,4])+1)*W[2,4]*(Carr[1,4,NoS]+deltaTime*k314)+0.5*(1-sign(W[2,4]))*W[2,4]*Carr[2,4,NoS])/h[1]-(w[2,4]*((Carr[1,4,NoS]+deltaTime*k314)-Carr[2,4,NoS]))/h[1]+(0.5*(sign(U[1,4])+1)*U[1,4]*Carr[1,3,NoS]+0.5*(1-sign(U[1,4]))*U[1,4]*(Carr[1,4,NoS]+deltaTime*k314))/l[4]+(u[1,4]*(Carr[1,3,NoS]-(Carr[1,4,NoS]+deltaTime*k314)))/l[4]
+  
+  k421 = (0.5*(sign(W[2,1])+1)*W[2,1]*Carr[1,1,NoS]+0.5*(1-sign(W[2,1]))*W[2,1]*(Carr[2,1,NoS]+deltaTime*k321))/h[2]+(w[2,1]*(Carr[1,1,NoS]-(Carr[2,1,NoS]+deltaTime*k321)))/h[2]-(0.5*(sign(W[3,1])+1)*W[3,1]*(Carr[2,1,NoS]+deltaTime*k321)+0.5*(1-sign(W[3,1]))*W[3,1]*Carr[3,1,NoS])/h[2]-(w[3,1]*((Carr[2,1,NoS]+deltaTime*k321)-Carr[3,1,NoS]))/h[2]-(0.5*(sign(U[2,2])+1)*U[2,2]*(Carr[2,1,NoS]+deltaTime*k321)+0.5*(1-sign(U[2,2]))*U[2,2]*Carr[2,2,NoS])/l[1]-(u[2,2]*((Carr[2,1,NoS]+deltaTime*k321)-Carr[2,2,NoS]))/l[1]
+  k422 = (0.5*(sign(W[2,2])+1)*W[2,2]*Carr[1,2,NoS]+0.5*(1-sign(W[2,2]))*W[2,2]*(Carr[2,2,NoS]+deltaTime*k322))/h[2]+(w[2,2]*(Carr[1,2,NoS]-(Carr[2,2,NoS]+deltaTime*k322)))/h[2]-(0.5*(sign(W[3,2])+1)*W[3,2]*(Carr[2,2,NoS]+deltaTime*k322)+0.5*(1-sign(W[3,2]))*W[3,2]*Carr[3,2,NoS])/h[2]-(w[3,2]*((Carr[2,2,NoS]+deltaTime*k322)-Carr[3,2,NoS]))/h[2]+(0.5*(sign(U[2,2])+1)*U[2,2]*Carr[2,1,NoS]+0.5*(1-sign(U[2,2]))*U[2,2]*(Carr[2,2,NoS]+deltaTime*k322))/l[2]+(u[2,2]*(Carr[2,1,NoS]-(Carr[2,2,NoS]+deltaTime*k322)))/l[2]-(0.5*(sign(U[2,3])+1)*U[2,3]*(Carr[2,2,NoS]+deltaTime*k322)+0.5*(1-sign(U[2,3]))*U[2,3]*Carr[2,3,NoS])/l[2]-(u[2,3]*((Carr[2,2,NoS]+deltaTime*k322)-Carr[2,3,NoS]))/l[2]
+  k423 = (0.5*(sign(W[2,3])+1)*W[2,3]*Carr[1,3,NoS]+0.5*(1-sign(W[2,3]))*W[2,3]*(Carr[2,3,NoS]+deltaTime*k323))/h[2]+(w[2,3]*(Carr[1,3,NoS]-(Carr[2,3,NoS]+deltaTime*k323)))/h[2]-(0.5*(sign(W[3,3])+1)*W[3,3]*(Carr[2,3,NoS]+deltaTime*k323)+0.5*(1-sign(W[3,3]))*W[3,3]*Carr[3,3,NoS])/h[2]-(w[3,3]*((Carr[2,3,NoS]+deltaTime*k323)-Carr[3,3,NoS]))/h[2]+(0.5*(sign(U[2,3])+1)*U[2,3]*Carr[2,2,NoS]+0.5*(1-sign(U[2,3]))*U[2,3]*(Carr[2,3,NoS]+deltaTime*k323))/l[3]+(u[2,3]*(Carr[2,2,NoS]-(Carr[2,3,NoS]+deltaTime*k323)))/l[3]-(0.5*(sign(U[2,4])+1)*U[2,4]*(Carr[2,3,NoS]+deltaTime*k323)+0.5*(1-sign(U[2,4]))*U[2,4]*Carr[2,4,NoS])/l[3]-(u[2,4]*((Carr[2,3,NoS]+deltaTime*k323)-Carr[2,4,NoS]))/l[3]
+  k424 = (0.5*(sign(W[2,4])+1)*W[2,4]*Carr[1,4,NoS]+0.5*(1-sign(W[2,4]))*W[2,4]*(Carr[2,4,NoS]+deltaTime*k324))/h[2]+(w[2,4]*(Carr[1,4,NoS]-(Carr[2,4,NoS]+deltaTime*k324)))/h[2]-(0.5*(sign(W[3,4])+1)*W[3,4]*(Carr[2,4,NoS]+deltaTime*k324)+0.5*(1-sign(W[3,4]))*W[3,4]*Carr[3,4,NoS])/h[2]-(w[3,4]*((Carr[2,4,NoS]+deltaTime*k324)-Carr[3,4,NoS]))/h[2]+(0.5*(sign(U[2,4])+1)*U[2,4]*Carr[2,3,NoS]+0.5*(1-sign(U[2,4]))*U[2,4]*(Carr[2,4,NoS]+deltaTime*k324))/l[4]+(u[2,4]*(Carr[2,3,NoS]-(Carr[2,4,NoS]+deltaTime*k324)))/l[4]   
+  
+  k431 = (0.5*(sign(W[3,1])+1)*W[3,1]*Carr[2,1,NoS]+0.5*(1-sign(W[3,1]))*W[3,1]*(Carr[3,1,NoS]+deltaTime*k331))/h[3]+(w[3,1]*(Carr[2,1,NoS]-(Carr[3,1,NoS]+deltaTime*k331)))/h[3]-(0.5*(sign(W[4,1])+1)*W[4,1]*(Carr[3,1,NoS]+deltaTime*k331)+0.5*(1-sign(W[4,1]))*W[4,1]*Carr[4,1,NoS])/h[3]-(w[4,1]*((Carr[3,1,NoS]+deltaTime*k331)-Carr[4,1,NoS]))/h[3]-(0.5*(sign(U[3,2])+1)*U[3,2]*(Carr[3,1,NoS]+deltaTime*k331)+0.5*(1-sign(U[3,2]))*U[3,2]*Carr[3,2,NoS])/l[1]- (u[3,2]*((Carr[3,1,NoS]+deltaTime*k331)-Carr[3,2,NoS]))/l[1]
+  k432 = (0.5*(sign(W[3,2])+1)*W[3,2]*Carr[2,2,NoS]+0.5*(1-sign(W[3,2]))*W[3,2]*(Carr[3,2,NoS]+deltaTime*k332))/h[3]+(w[3,2]*(Carr[2,2,NoS]-(Carr[3,2,NoS]+deltaTime*k332)))/h[3]-(0.5*(sign(W[4,2])+1)*W[4,2]*(Carr[3,2,NoS]+deltaTime*k332)+0.5*(1-sign(W[4,2]))*W[4,2]*Carr[4,2,NoS])/h[3]-(w[4,2]*((Carr[3,2,NoS]+deltaTime*k332)-Carr[4,2,NoS]))/h[3]+(0.5*(sign(U[3,2])+1)*U[3,2]*Carr[3,1,NoS]+0.5*(1-sign(U[3,2]))*U[3,2]*(Carr[3,2,NoS]+deltaTime*k332))/l[2]+ (u[3,2]*(Carr[3,1,NoS]-(Carr[3,2,NoS]+deltaTime*k332)))/l[2]-(0.5*(sign(U[3,3])+1)*U[3,3]*(Carr[3,2,NoS]+deltaTime*k332)+0.5*(1-sign(U[3,3]))*U[3,3]*Carr[3,3,NoS])/l[2]-(u[3,3]*((Carr[3,2,NoS]+deltaTime*k332)-Carr[3,3,NoS]))/l[2]
+  k433 = (0.5*(sign(W[3,3])+1)*W[3,3]*Carr[2,3,NoS]+0.5*(1-sign(W[3,3]))*W[3,3]*(Carr[3,3,NoS]+deltaTime*k333))/h[3]+(w[3,3]*(Carr[2,3,NoS]-(Carr[3,3,NoS]+deltaTime*k333)))/h[3]-(0.5*(sign(W[4,3])+1)*W[4,3]*(Carr[3,3,NoS]+deltaTime*k333)+0.5*(1-sign(W[4,3]))*W[4,3]*Carr[4,3,NoS])/h[3]-(w[4,3]*((Carr[3,3,NoS]+deltaTime*k333)-Carr[4,3,NoS]))/h[3]+(0.5*(sign(U[3,3])+1)*U[3,3]*Carr[3,2,NoS]+0.5*(1-sign(U[3,3]))*U[3,3]*(Carr[3,3,NoS]+deltaTime*k333))/l[3]+ (u[3,3]*(Carr[3,2,NoS]-(Carr[3,3,NoS]+deltaTime*k333)))/l[3]-(0.5*(sign(U[3,4])+1)*U[3,4]*(Carr[3,3,NoS]+deltaTime*k333)+0.5*(1-sign(U[3,4]))*U[3,4]*Carr[3,4,NoS])/l[3]-(u[3,4]*((Carr[3,3,NoS]+deltaTime*k333)-Carr[3,4,NoS]))/l[3]
+  k434 = (0.5*(sign(W[3,4])+1)*W[3,4]*Carr[2,4,NoS]+0.5*(1-sign(W[3,4]))*W[3,4]*(Carr[3,4,NoS]+deltaTime*k334))/h[3]+(w[3,4]*(Carr[2,4,NoS]-(Carr[3,4,NoS]+deltaTime*k334)))/h[3]-(0.5*(sign(W[4,4])+1)*W[4,4]*(Carr[3,4,NoS]+deltaTime*k334)+0.5*(1-sign(W[4,4]))*W[4,4]*Carr[4,4,NoS])/h[3]-(w[4,4]*((Carr[3,4,NoS]+deltaTime*k334)-Carr[4,4,NoS]))/h[3]+(0.5*(sign(U[3,4])+1)*U[3,4]*Carr[3,3,NoS]+0.5*(1-sign(U[3,4]))*U[3,4]*(Carr[3,4,NoS]+deltaTime*k334))/l[4]+ (u[3,4]*(Carr[3,3,NoS]-(Carr[3,4,NoS]+deltaTime*k334)))/l[4]   
+  
+  k441 = (0.5*(sign(W[4,1])+1)*W[4,1]*Carr[3,1,NoS]+0.5*(1-sign(W[4,1]))*W[4,1]*(Carr[4,1,NoS]+deltaTime*k341))/h[4]+(w[4,1]*(Carr[3,1,NoS]-(Carr[4,1,NoS]+deltaTime*k341)))/h[4]-(w[5,1]*((Carr[4,1,NoS]+deltaTime*k341)-cBgarr[NoS]))/h[4]-(0.5*(sign(U[4,2])+1)*U[4,2]*(Carr[4,1,NoS]+deltaTime*k341)+0.5*(1-sign(U[4,2]))*U[4,2]*Carr[4,2,NoS])/l[1]-(u[4,2]*((Carr[4,1,NoS]+deltaTime*k341)-Carr[4,2,NoS]))/l[1]
+  k442 = (0.5*(sign(W[4,2])+1)*W[4,2]*Carr[3,2,NoS]+0.5*(1-sign(W[4,2]))*W[4,2]*(Carr[4,2,NoS]+deltaTime*k342))/h[4]+(w[4,2]*(Carr[3,2,NoS]-(Carr[4,2,NoS]+deltaTime*k342)))/h[4]-(w[5,2]*((Carr[4,2,NoS]+deltaTime*k342)-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,2])+1)*U[4,2]*Carr[4,1,NoS]+0.5*(1-sign(U[4,2]))*U[4,2]*(Carr[4,2,NoS]+deltaTime*k342))/l[2]+(u[4,2]*(Carr[4,1,NoS]-(Carr[4,2,NoS]+deltaTime*k342)))/l[2]-(0.5*(sign(U[4,3])+1)*U[4,3]*(Carr[4,2,NoS]+deltaTime*k342)+0.5*(1-sign(U[4,3]))*U[4,3]*Carr[4,3,NoS])/l[2]-(u[4,3]*((Carr[4,2,NoS]+deltaTime*k342)-Carr[4,3,NoS]))/l[2]
+  k443 = (0.5*(sign(W[4,3])+1)*W[4,3]*Carr[3,3,NoS]+0.5*(1-sign(W[4,3]))*W[4,3]*(Carr[4,3,NoS]+deltaTime*k343))/h[4]+(w[4,3]*(Carr[3,3,NoS]-(Carr[4,3,NoS]+deltaTime*k343)))/h[4]-(w[5,3]*((Carr[4,3,NoS]+deltaTime*k343)-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,3])+1)*U[4,3]*Carr[4,2,NoS]+0.5*(1-sign(U[4,3]))*U[4,3]*(Carr[4,3,NoS]+deltaTime*k343))/l[3]+(u[4,3]*(Carr[4,2,NoS]-(Carr[4,3,NoS]+deltaTime*k343)))/l[3]-(0.5*(sign(U[4,4])+1)*U[4,4]*(Carr[4,3,NoS]+deltaTime*k343)+0.5*(1-sign(U[4,4]))*U[4,4]*Carr[4,4,NoS])/l[3]-(u[4,4]*((Carr[4,3,NoS]+deltaTime*k343)-Carr[4,4,NoS]))/l[3]
+  k444 = (0.5*(sign(W[4,4])+1)*W[4,4]*Carr[3,4,NoS]+0.5*(1-sign(W[4,4]))*W[4,4]*(Carr[4,4,NoS]+deltaTime*k344))/h[4]+(w[4,4]*(Carr[3,4,NoS]-(Carr[4,4,NoS]+deltaTime*k344)))/h[4]-(w[5,4]*((Carr[4,4,NoS]+deltaTime*k344)-cBgarr[NoS]))/h[4]+(0.5*(sign(U[4,4])+1)*U[4,4]*Carr[4,3,NoS]+0.5*(1-sign(U[4,4]))*U[4,4]*(Carr[4,4,NoS]+deltaTime*k344))/l[4]+(u[4,4]*(Carr[4,3,NoS]-(Carr[4,4,NoS]+deltaTime*k344)))/l[4]  
+  
+  Carr[1,1,NoS] = Carr[1,1,NoS] + deltaTime*(k111+2*k211+2*k311+k411)/6
+  Carr[1,2,NoS] = Carr[1,2,NoS] + deltaTime*(k112+2*k212+2*k312+k412)/6
+  Carr[1,3,NoS] = Carr[1,3,NoS] + deltaTime*(k113+2*k213+2*k313+k413)/6
+  Carr[1,4,NoS] = Carr[1,4,NoS] + deltaTime*(k114+2*k214+2*k314+k414)/6
+  Carr[2,1,NoS] = Carr[2,1,NoS] + deltaTime*(k121+2*k221+2*k321+k421)/6
+  Carr[2,2,NoS] = Carr[2,2,NoS] + deltaTime*(k122+2*k222+2*k322+k422)/6
+  Carr[2,3,NoS] = Carr[2,3,NoS] + deltaTime*(k123+2*k223+2*k323+k423)/6
+  Carr[2,4,NoS] = Carr[2,4,NoS] + deltaTime*(k124+2*k224+2*k324+k424)/6
+  Carr[3,1,NoS] = Carr[3,1,NoS] + deltaTime*(k131+2*k231+2*k331+k431)/6
+  Carr[3,2,NoS] = Carr[3,2,NoS] + deltaTime*(k132+2*k232+2*k332+k432)/6
+  Carr[3,3,NoS] = Carr[3,3,NoS] + deltaTime*(k133+2*k233+2*k333+k433)/6
+  Carr[3,4,NoS] = Carr[3,4,NoS] + deltaTime*(k134+2*k234+2*k334+k434)/6
+  Carr[4,1,NoS] = Carr[4,1,NoS] + deltaTime*(k141+2*k241+2*k341+k441)/6
+  Carr[4,2,NoS] = Carr[4,2,NoS] + deltaTime*(k142+2*k242+2*k342+k442)/6
+  Carr[4,3,NoS] = Carr[4,3,NoS] + deltaTime*(k143+2*k243+2*k343+k443)/6
+  Carr[4,4,NoS] = Carr[4,4,NoS] + deltaTime*(k144+2*k244+2*k344+k444)/6
+  }
+  return(Carr)
+} 
+
+  # calculate fluxes
+  # F = array(0,c(nbv+1,nbh))	# horizontal flux
+  # G = array(0,c(nbv,nbh))	# vertical flux
+  # bbb=C1case
+
+  # Note
+  # Ft[k,i] = (u[k,i](Carr[k,i-1,NoS]-Carr[k,i,NoS]))
+  # Ft[1,2] = (u[1,2]*(Carr[1,1,NoS]-Carr[1,2,NoS]))
+  # Ft[1,3] = (u[1,3]*(Carr[1,2,NoS]-Carr[1,3,NoS]))
+  # Ft[1,4] = (u[1,4]*(Carr[1,3,NoS]-Carr[1,4,NoS]))
+  # Ft[2,2] = (u[2,2]*(Carr[2,1,NoS]-Carr[2,2,NoS]))
+  # Ft[2,3] = (u[2,3]*(Carr[2,2,NoS]-Carr[2,3,NoS]))
+  # Ft[2,4] = (u[2,4]*(Carr[2,3,NoS]-Carr[2,4,NoS]))
+  # Ft[3,2] = (u[3,2]*(Carr[3,1,NoS]-Carr[3,2,NoS]))
+  # Ft[3,3] = (u[3,3]*(Carr[3,2,NoS]-Carr[3,3,NoS]))
+  # Ft[3,4] = (u[3,4]*(Carr[3,3,NoS]-Carr[3,4,NoS]))
+  # Ft[4,2] = (u[4,2]*(Carr[4,1,NoS]-Carr[4,2,NoS]))
+  # Ft[4,3] = (u[4,3]*(Carr[4,2,NoS]-Carr[4,3,NoS]))
+  # Ft[4,4] = (u[4,4]*(Carr[4,3,NoS]-Carr[4,4,NoS]))
+  # Fa[k,i] = (0.5*(sign(U[k,i])+1)*U[k,i]*Carr[k,i-1,NoS]+0.5*(1-sign(U[k,i]))*U[k,i]*Carr[k,i,NoS])
+  # Fa[1,2] = (0.5*(sign(U[1,2])+1)*U[1,2]*Carr[1,1,NoS]+0.5*(1-sign(U[1,2]))*U[1,2]*Carr[1,2,NoS])
+  # Fa[1,3] = (0.5*(sign(U[1,3])+1)*U[1,3]*Carr[1,2,NoS]+0.5*(1-sign(U[1,3]))*U[1,3]*Carr[1,3,NoS])
+  # Fa[1,4] = (0.5*(sign(U[1,4])+1)*U[1,4]*Carr[1,3,NoS]+0.5*(1-sign(U[1,4]))*U[1,4]*Carr[1,4,NoS])
+  # Fa[2,2] = (0.5*(sign(U[2,2])+1)*U[2,2]*Carr[2,1,NoS]+0.5*(1-sign(U[2,2]))*U[2,2]*Carr[2,2,NoS])
+  # Fa[2,3] = (0.5*(sign(U[2,3])+1)*U[2,3]*Carr[2,2,NoS]+0.5*(1-sign(U[2,3]))*U[2,3]*Carr[2,3,NoS])
+  # Fa[2,4] = (0.5*(sign(U[2,4])+1)*U[2,4]*Carr[2,3,NoS]+0.5*(1-sign(U[2,4]))*U[2,4]*Carr[2,4,NoS])
+  # Fa[3,2] = (0.5*(sign(U[3,2])+1)*U[3,2]*Carr[3,1,NoS]+0.5*(1-sign(U[3,2]))*U[3,2]*Carr[3,2,NoS])
+  # Fa[3,3] = (0.5*(sign(U[3,3])+1)*U[3,3]*Carr[3,2,NoS]+0.5*(1-sign(U[3,3]))*U[3,3]*Carr[3,3,NoS])
+  # Fa[3,4] = (0.5*(sign(U[3,4])+1)*U[3,4]*Carr[3,3,NoS]+0.5*(1-sign(U[3,4]))*U[3,4]*Carr[3,4,NoS])
+  # Fa[4,2] = (0.5*(sign(U[4,2])+1)*U[4,2]*Carr[4,1,NoS]+0.5*(1-sign(U[4,2]))*U[4,2]*Carr[4,2,NoS])
+  # Fa[4,3] = (0.5*(sign(U[4,3])+1)*U[4,3]*Carr[4,2,NoS]+0.5*(1-sign(U[4,3]))*U[4,3]*Carr[4,3,NoS])
+  # Fa[4,4] = (0.5*(sign(U[4,4])+1)*U[4,4]*Carr[4,3,NoS]+0.5*(1-sign(U[4,4]))*U[4,4]*Carr[4,4,NoS])
+  # Gt[k,i] = (w[k,i](Carr[k-1,i,NoS]-Carr[k,i,NoS]))
+  # Gt[2,1] = (w[2,1]*(Carr[1,1,NoS]-Carr[2,1,NoS]))
+  # Gt[2,2] = (w[2,2]*(Carr[1,2,NoS]-Carr[2,2,NoS]))
+  # Gt[2,3] = (w[2,3]*(Carr[1,3,NoS]-Carr[2,3,NoS]))
+  # Gt[2,4] = (w[2,4]*(Carr[1,4,NoS]-Carr[2,4,NoS]))
+  # Gt[3,1] = (w[3,1]*(Carr[2,1,NoS]-Carr[3,1,NoS]))
+  # Gt[3,2] = (w[3,2]*(Carr[2,2,NoS]-Carr[3,2,NoS]))
+  # Gt[3,3] = (w[3,3]*(Carr[2,3,NoS]-Carr[3,3,NoS]))
+  # Gt[3,4] = (w[3,4]*(Carr[2,4,NoS]-Carr[3,4,NoS]))
+  # Gt[4,1] = (w[4,1]*(Carr[3,1,NoS]-Carr[4,1,NoS]))
+  # Gt[4,2] = (w[4,2]*(Carr[3,2,NoS]-Carr[4,2,NoS]))
+  # Gt[4,3] = (w[4,3]*(Carr[3,3,NoS]-Carr[4,3,NoS]))
+  # Gt[4,4] = (w[4,4]*(Carr[3,4,NoS]-Carr[4,4,NoS]))
+  # Gt[5,1] = (w[5,1]*(Carr[4,1,NoS]-cBgarr[NoS]))
+  # Gt[5,2] = (w[5,2]*(Carr[4,2,NoS]-cBgarr[NoS]))
+  # Gt[5,3] = (w[5,3]*(Carr[4,3,NoS]-cBgarr[NoS]))
+  # Gt[5,4] = (w[5,4]*(Carr[4,4,NoS]-cBgarr[NoS]))
+  # Ga[k,i] = (0.5*(sign(W[k,i])+1)*W[k,i]*Carr[k-1,i,NoS]+0.5*(1-sign(W[k,i]))*W[k,i]*Carr[k,i,NoS])
+  # Ga[2,1] = (0.5*(sign(W[2,1])+1)*W[2,1]*Carr[1,1,NoS]+0.5*(1-sign(W[2,1]))*W[2,1]*Carr[2,1,NoS])
+  # Ga[2,2] = (0.5*(sign(W[2,2])+1)*W[2,2]*Carr[1,2,NoS]+0.5*(1-sign(W[2,2]))*W[2,2]*Carr[2,2,NoS])
+  # Ga[2,3] = (0.5*(sign(W[2,3])+1)*W[2,3]*Carr[1,3,NoS]+0.5*(1-sign(W[2,3]))*W[2,3]*Carr[2,3,NoS])
+  # Ga[2,4] = (0.5*(sign(W[2,4])+1)*W[2,4]*Carr[1,4,NoS]+0.5*(1-sign(W[2,4]))*W[2,4]*Carr[2,4,NoS])
+  # Ga[3,1] = (0.5*(sign(W[3,1])+1)*W[3,1]*Carr[2,1,NoS]+0.5*(1-sign(W[3,1]))*W[3,1]*Carr[3,1,NoS])
+  # Ga[3,2] = (0.5*(sign(W[3,2])+1)*W[3,2]*Carr[2,2,NoS]+0.5*(1-sign(W[3,2]))*W[3,2]*Carr[3,2,NoS])
+  # Ga[3,3] = (0.5*(sign(W[3,3])+1)*W[3,3]*Carr[2,3,NoS]+0.5*(1-sign(W[3,3]))*W[3,3]*Carr[3,3,NoS])
+  # Ga[3,4] = (0.5*(sign(W[3,4])+1)*W[3,4]*Carr[2,4,NoS]+0.5*(1-sign(W[3,4]))*W[3,4]*Carr[3,4,NoS])
+  # Ga[4,1] = (0.5*(sign(W[4,1])+1)*W[4,1]*Carr[3,1,NoS]+0.5*(1-sign(W[4,1]))*W[4,1]*Carr[4,1,NoS])
+  # Ga[4,2] = (0.5*(sign(W[4,2])+1)*W[4,2]*Carr[3,2,NoS]+0.5*(1-sign(W[4,2]))*W[4,2]*Carr[4,2,NoS])
+  # Ga[4,3] = (0.5*(sign(W[4,3])+1)*W[4,3]*Carr[3,3,NoS]+0.5*(1-sign(W[4,3]))*W[4,3]*Carr[4,3,NoS])
+  # Ga[4,4] = (0.5*(sign(W[4,4])+1)*W[4,4]*Carr[3,4,NoS]+0.5*(1-sign(W[4,4]))*W[4,4]*Carr[4,4,NoS])
+  
+  
+  # k111 = -Ga[2,1]/h[1]-Gt[2,1]/h[1]-Fa[1,2]/l[1]-Ft[1,2]/l[1]
+  # k112 = -Ga[2,2]/h[1]-Gt[2,2]/h[1]+Fa[1,2]/l[2]+Ft[1,2]/l[2]-Fa[1,3]/l[2]-Ft[1,3]/l[2]
+  # k113 = -Ga[2,3]/h[1]-Gt[2,3]/h[1]+Fa[1,3]/l[3]+Ft[1,3]/l[3]-Fa[1,4]/l[3]-Ft[1,4]/l[3]
+  # k114 = -Ga[2,4]/h[1]-Gt[2,4]/h[1]+Fa[1,4]/l[4]+Ft[1,4]/l[4]
+  # k121 = Ga[2,1]/h[2]+Gt[2,1]/h[2]-Ga[3,1]/h[2]-Gt[3,1]/h[2]-Fa[2,2]/l[1]-Ft[2,2]/l[1]
+  # k122 = Ga[2,2]/h[2]+Gt[2,2]/h[2]-Ga[3,2]/h[2]-Gt[3,2]/h[2]+Fa[2,2]/l[2]+Ft[2,2]/l[2]-Fa[2,3]/l[2]-Ft[2,3]/l[2]
+  # k123 = Ga[2,3]/h[2]+Gt[2,3]/h[2]-Ga[3,3]/h[2]-Gt[3,3]/h[2]+Fa[2,3]/l[3]+Ft[2,3]/l[3]-Fa[2,4]/l[3]-Ft[2,4]/l[3]
+  # k124 = Ga[2,4]/h[2]+Gt[2,4]/h[2]-Ga[3,4]/h[2]-Gt[3,4]/h[2]+Fa[2,4]/l[4]+Ft[2,4]/l[4]   
+  # k131 = Ga[3,1]/h[3]+Gt[3,1]/h[3]-Ga[4,1]/h[3]-Gt[4,1]/h[3]-Fa[3,2]/l[1]-Ft[3,2]/l[1]
+  # k132 = Ga[3,2]/h[3]+Gt[3,2]/h[3]-Ga[4,2]/h[3]-Gt[4,2]/h[3]+Fa[3,2]/l[2]+Ft[3,2]/l[2]-Fa[3,3]/l[2]-Ft[3,3]/l[2]
+  # k133 = Ga[3,3]/h[3]+Gt[3,3]/h[3]-Ga[4,3]/h[3]-Gt[4,3]/h[3]+Fa[3,3]/l[3]+Ft[3,3]/l[3]-Fa[3,4]/l[3]-Ft[3,4]/l[3]
+  # k134 = Ga[3,4]/h[3]+Gt[3,4]/h[3]-Ga[4,4]/h[3]-Gt[4,4]/h[3]+Fa[3,4]/l[4]+Ft[3,4]/l[4]   
+  # k141 = Ga[4,1]/h[4]+Gt[4,1]/h[4]-Gt[5,1]/h[4]-Fa[4,2]/l[1]-Ft[4,2]/l[1]
+  # k142 = Ga[4,2]/h[4]+Gt[4,2]/h[4]-Gt[5,2]/h[4]+Fa[4,2]/l[2]+Ft[4,2]/l[2]-Fa[4,3]/l[2]-Ft[4,3]/l[2]
+  # k143 = Ga[4,3]/h[4]+Gt[4,3]/h[4]-Gt[5,3]/h[4]+Fa[4,3]/l[3]+Ft[4,3]/l[3]-Fa[4,4]/l[3]-Ft[4,4]/l[3]
+  # k144 = Ga[4,4]/h[4]+Gt[4,4]/h[4]-Gt[5,4]/h[4]+Fa[4,4]/l[4]+Ft[4,4]/l[4]  
+  
+  # browser()
+  # return(list(Carr, fw=f, fu=g, we=w, wa=W, ue=u, ua=U, Amatrix=a, d=d, residual=C))
+## **************************  COMPLETE!  ***************************** ##
