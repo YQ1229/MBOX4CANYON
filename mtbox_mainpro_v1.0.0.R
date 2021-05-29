@@ -351,12 +351,10 @@ for (nint in 1:nosteps)
       # add emissions into the model
        
       for (NoS in 1:Numspe)
-      {
-        Carr[1,1,NoS] = Carr[1,1,NoS]+Emiarr[NoS,1]*deltaTime*traScale[1]; # 1st road!
-        Carr[1,2,NoS] = Carr[1,2,NoS]+Emiarr[NoS,2]*deltaTime*traScale[2]; # 2nd road!
-        Carr[1,3,NoS] = Carr[1,3,NoS]+Emiarr[NoS,3]*deltaTime*traScale[3]; # 3rd road!
-        Carr[1,4,NoS] = Carr[1,4,NoS]+Emiarr[NoS,4]*deltaTime*traScale[4]; # 4th road!
-      } 
+        for(i in 1:nbh)
+        {{
+          Carr[1,i,NoS] = Carr[1,i,NoS]+Emiarr[NoS,i]*deltaTime*traScale[i];
+          }}
       
       # add exchanges with background into the model
       Carr = exclock(u = ue, w = we, U = ua, W = wa, Carr, cBgarr,
