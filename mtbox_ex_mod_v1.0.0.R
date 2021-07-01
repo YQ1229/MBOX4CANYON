@@ -16,8 +16,8 @@ exclock <- function(u, w, U, W, Carr, cBgarr,h,l,
   # residual: should be 0 for a correct solution
 
   k = 1; i = 1;NoS = 1
-  k1 = array(0,c(nbh,nbv)); k2 = array(0,c(nbh,nbv));
-  k3 = array(0,c(nbh,nbv)); k4 = array(0,c(nbh,nbv));
+  k1 = array(0,c(nbv,nbh)); k2 = array(0,c(nbv,nbh));
+  k3 = array(0,c(nbv,nbh)); k4 = array(0,c(nbv,nbh));
   
   for (NoS in 1:Numspe) {
 
