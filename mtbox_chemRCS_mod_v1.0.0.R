@@ -1,6 +1,8 @@
 ## =======================================================================
-##  *********** load chemistry module for multi-box model  ***********  ##
-## created by YQ- on 23/07/2020
+##  *********** load chemistry module for multi-box model  ***********  #
+## Created by YQ- on 23/07/2020 based on the work of 
+## Zhong, J., Cai, X.M. and Bloss, W.J., 2015. Modelling the dispersion and transport of reactive pollutants in a deep urban street canyon: Using large-eddy simulation. Environmental pollution, 200, pp.42-52.
+
 ## =======================================================================
 chemi <- function (Carr, deltaTime, beta, dtchem) 
 {
